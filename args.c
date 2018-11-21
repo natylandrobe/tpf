@@ -12,6 +12,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 	}
 
 	for (i = 1; i < argc; i++){
+		printf("arg: %d\n", i);
 		/*se fija si el argumento empieza con '-' */
 		if (*argv[i] == ARG_C){
 			argumento = *(argv[i]+1);
@@ -53,6 +54,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						case INFILE_C:
 
 							if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								printf("argumento in es default\n");
 								break;
 							}
 
@@ -104,6 +106,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							}
 
 							else{
+								printf("aca01\n");
 								return ST_INV;
 							}
 					}
@@ -114,6 +117,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 					if(!strcmp(argv[i], ARG_NAME)){
 
 						if(*argv[i+1] == ARG_C){
+							printf("aca02\n");
 							return ST_INV;
 						}
 
@@ -138,6 +142,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						}
 
 						else{
+							printf("aca03\n");
 							return ST_INV;
 							}
 					}
@@ -201,25 +206,18 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						}
 
 						else{
+							printf("aca04\n");
 							return ST_INV;
 						}
 					}
 
 					else{
+						printf("aca05\n");
 						return ST_INV;
 
 					}
 						
 				}
-
-				else{
-					return ST_INV;
-
-				}
-			}
-
-			else{
-				return ST_INV;
 
 			}
 
