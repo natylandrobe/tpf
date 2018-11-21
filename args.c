@@ -1,6 +1,9 @@
 #include "defArgs.h"
 
+#define MIN_DIG 0
+#define MAX_DIG 9
 /* Lee los argumentos recibidos, verifica que sean correctos y decide que accion tomar segun el argumento */
+
 status_t takeArgs(int argc, char *argv[], struct args *arg){
 	int i, argumento;
 
@@ -8,16 +11,9 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 		return ST_EPTNULL;
 	}
 
-	/* Ver de hacer una funcion que setee todo en default 
-	*name = DEFAULT_NAME;
-	if(defaultFecha(date) != ST_OK){
-		return ST_EPTNULL;
-	}*/
-
 	for (i = 1; i < argc; i++){
 		/*se fija si el argumento empieza con '-' */
 		if (*argv[i] == ARG_C){
-
 			argumento = *(argv[i]+1);
 			if(argumento == HELP_C || argumento == toupper(HELP_C) || !strcmp(argv[i], ARG_HELP)){
 				return ST_HELP;
@@ -28,8 +24,9 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 					switch (tolower(argumento)){
 						case NAME_C:
 							if(*argv[i+1] == ARG_C){
-								return ST_INV;
+								return ST_INV;	
 							}
+
 							arg->name = (char *)realloc(arg->name, sizeof(char)*(strlen(argv[i+1])+1));
 
 							if(arg->name == NULL){
@@ -38,6 +35,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							}
 
 							strcpy(arg->name, argv[i+1]);
+
 							break;
 
 						case PROT_C:
@@ -53,6 +51,11 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							break;
 
 						case INFILE_C:
+
+							if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								break;
+							}
+
 							arg->infile_n = (char *)realloc(arg->infile_n, sizeof(char)*(strlen(argv[i+1])+1));
 
 							if(arg->infile_n == NULL){
@@ -64,6 +67,11 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							break;
 
 						case OUTFILE_C:
+
+							if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								break;
+							}
+
 							arg->outfile_n = (char *)realloc(arg->outfile_n, sizeof(char)*(strlen(argv[i+1])+1));
 
 							if(arg->outfile_n == NULL){
@@ -75,6 +83,11 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							break;
 
 						case LOGFILE_C:
+
+							if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								break;
+							}
+
 							arg->logfile_n = (char *)realloc(arg->logfile_n, sizeof(char)*(strlen(argv[i+1])+1));
 
 							if(arg->logfile_n == NULL){
@@ -101,7 +114,6 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 					if(!strcmp(argv[i], ARG_NAME)){
 
 						if(*argv[i+1] == ARG_C){
-
 							return ST_INV;
 						}
 
@@ -132,36 +144,54 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 
 					else if(!strcmp(argv[i], ARG_INFILE)){
 
-						arg->infile_n = (char *)realloc(arg->infile_n, sizeof(char)*(strlen(argv[i+1])+1));
-
-						if(arg->infile_n == NULL){
-							free(arg->infile_n);
-							return ST_ENOMEM;
+						if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								;
 						}
-						strcpy(arg->infile_n, argv[i+1]);
+
+						else{
+							arg->infile_n = (char *)realloc(arg->infile_n, sizeof(char)*(strlen(argv[i+1])+1));
+
+							if(arg->infile_n == NULL){
+								free(arg->infile_n);
+								return ST_ENOMEM;
+							}
+							strcpy(arg->infile_n, argv[i+1]);
+						}
 					}
 
 					else if(!strcmp(argv[i], ARG_OUTFILE)){
 
-						arg->outfile_n = (char *)realloc(arg->outfile_n, sizeof(char)*(strlen(argv[i+1])+1));
-
-						if(arg->outfile_n == NULL){
-							free(arg->outfile_n);
-							return ST_ENOMEM;
+						if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								;
 						}
-						strcpy(arg->outfile_n, argv[i+1]);
+
+						else{
+							arg->outfile_n = (char *)realloc(arg->outfile_n, sizeof(char)*(strlen(argv[i+1])+1));
+
+							if(arg->outfile_n == NULL){
+								free(arg->outfile_n);
+								return ST_ENOMEM;
+							}
+							strcpy(arg->outfile_n, argv[i+1]);
+						}
 					}
 
 					else if(!strcmp(argv[i], ARG_LOGFILE)){
 
-						arg->logfile_n = (char *)realloc(arg->logfile_n, sizeof(char)*(strlen(argv[i+1])+1));
-							
-						if(arg->logfile_n == NULL){
-							free(arg->logfile_n);
-							return ST_ENOMEM;
+						if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								;
 						}
 
-						strcpy(arg->logfile_n, argv[i+1]);						
+						else{
+							arg->logfile_n = (char *)realloc(arg->logfile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							
+							if(arg->logfile_n == NULL){
+								free(arg->logfile_n);
+								return ST_ENOMEM;
+							}
+
+							strcpy(arg->logfile_n, argv[i+1]);
+						}						
 					}
 
 					else if(!strcmp(argv[i], ARG_MAX)){
@@ -174,33 +204,25 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							return ST_INV;
 						}
 					}
-					
-					else{
 
+					else{
 						return ST_INV;
 
-						}
+					}
 						
 				}
 
 				else{
-
 					return ST_INV;
 
-					}
 				}
+			}
 
 			else{
-
 				return ST_INV;
 
 			}
 
-		}
-
-		else{
-
-			return ST_INV;
 		}
 	}
 

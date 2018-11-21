@@ -1,7 +1,7 @@
 #include "cargarStructs.h" 
 
 /* Separar en campos la sentencia, y cargar los datos procesados a la estructura */
-bool cargarStruct(char *s, struct data * newS, struct fecha date){
+/*bool cargarStruct(char *s, struct data * newS, struct fecha date){
 
 	char *str, *check;
 	char *tokens[CANT_TOKEN];
@@ -69,10 +69,10 @@ bool cargarStruct(char *s, struct data * newS, struct fecha date){
 	newS->separacion = sep;
 	
 	return true;
-}
+}*/
 
 /* Verifica que la cadena tenga el formato adecuado, procesa los datos y los carga en la estrcutura */
-bool cargarFecha(char *s, struct fecha *date){
+/*bool cargarFecha(char *s, struct fecha *date){
 
 	int fecha, mes, dia, anio;
 	char *check;
@@ -102,7 +102,7 @@ bool cargarFecha(char *s, struct fecha *date){
 	}
 
 	return true;
-}
+}*/
 
 /* Carga la fecha del sistema a la estructura de tipo fecha */
 status_t defaultFecha(struct fecha *def){
@@ -131,3 +131,59 @@ status_t defaultFecha(struct fecha *def){
 
 }
 
+status_t defaultArgs(struct args *arg){
+
+	if(!arg){
+		return ST_EPTNULL;
+	}
+
+	arg->name = (char *)malloc(sizeof(char)*(strlen(DEFAULT_NAME)+1));
+
+	if(arg->name == NULL){
+		return ST_ENOMEM;
+	}
+
+	strcpy(arg->name, DEFAULT_NAME);
+
+	arg->infile_n = (char *)malloc(sizeof(char)*(strlen(DEFAULT_INFILE)+1));
+
+	if(arg->infile_n == NULL){
+		free(arg->name);
+		arg->name = NULL;
+		return ST_ENOMEM;
+	}
+
+	strcpy(arg->infile_n, DEFAULT_INFILE);
+
+	arg->outfile_n = (char *)malloc(sizeof(char)*(strlen(DEFAULT_OUTFILE)+1));
+
+	if(arg->outfile_n == NULL){
+		free(arg->name);
+		arg->name = NULL;
+		free(arg->infile_n);
+		arg->infile_n = NULL;
+		return ST_ENOMEM;
+	}
+
+	strcpy(arg->outfile_n, DEFAULT_OUTFILE);
+
+	arg->logfile_n = (char *)malloc(sizeof(char)*(strlen(DEFAULT_LOGFILE)+1));
+
+	if(arg->outfile_n == NULL){
+		free(arg->name);
+		arg->name = NULL;
+		free(arg->infile_n);
+		arg->infile_n = NULL;
+		free(arg->outfile_n);
+		arg->infile_n = NULL;
+		return ST_ENOMEM;
+	}
+
+	strcpy(arg->logfile_n, DEFAULT_LOGFILE);
+
+	arg->protocol = INV;
+
+	arg->maxlen = rand() % RAND_DELIM;
+
+	return ST_OK;
+}

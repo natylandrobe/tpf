@@ -2,7 +2,6 @@
 #define CARGARSTRUCTS_H
 
 #include "check.h"
-#include <string.h>
 #include <sys/time.h>
 
 #define DELIM ","
@@ -24,6 +23,8 @@
 #define DIG_ANIO 10000 
 #define DIG_MES 100 
 #define CANT_DIG_FECHA 8 
+
+#define RAND_DELIM 50
 
 double convertirLon(const char lon[], char * cardinal);
 double convertirLat(const char lat[], char * cardinal);

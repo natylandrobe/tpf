@@ -2,10 +2,8 @@
 #define DEFARGS_H
 
 #include <ctype.h>
-#include <string.h>
 #include "check.h"
 
-#define DEFAULT_NAME "Default Name"
 #define ARG_HELP "--help"
 #define ARG_NAME "--name"
 #define ARG_PROT "--protocol"
@@ -13,6 +11,7 @@
 #define ARG_OUTFILE "--outfile"
 #define ARG_LOGFILE	"--logfile"
 #define ARG_MAX "--maxlen"
+#define DEFAULT_FILE "-"
 #define HELP_C 'h'
 #define NAME_C 'n'
 #define PROT_C 'p'
