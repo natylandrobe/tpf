@@ -43,7 +43,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							if(!strcmp(argv[i+1], PROT_NMEA)){
 								arg->protocol = NMEA;
 							}
-							if(!strcmp(argv[i+1], PROT_UBX)){
+							else if(!strcmp(argv[i+1], PROT_UBX)){
 								arg->protocol = UBX;
 							}
 							else{
@@ -132,12 +132,11 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 					}
 
 					else if(!strcmp(argv[i], ARG_PROT)){
-
 						if(!strcmp(argv[i+1], PROT_NMEA)){
 								arg->protocol = NMEA;
 							}
 
-						if(!strcmp(argv[i+1], PROT_UBX)){
+						else if(!strcmp(argv[i+1], PROT_UBX)){
 							arg->protocol = UBX;
 						}
 

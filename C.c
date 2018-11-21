@@ -4,6 +4,10 @@
 
 #define MSJ_ERR_1 "puntero nulo en defaultArgs"
 #define MSJ_ERR_2 "no mem en defaultArgs"
+#define MSJ_ERR_EPTNULL "puntero nulo takeargs"
+#define MSJ_ERR_OPENL "no se pudo abrir logfile"
+#define MSJ_ERR_OPENI "no se pudo abrir infile"
+#define MSJ_ERR_OPENO "no se pudo abrir outfile"
 
 int main (int argc, char *argv[]){
 FILE *fin, *fout, *flog;
@@ -37,7 +41,7 @@ FILE *fin, *fout, *flog;
 
 	else if(st == ST_EPTNULL){
 
-		fprintf(stderr, "%s\n", MSJ_ERR_INV);//cambiar mensaje
+		fprintf(stderr, "%s\n", MSJ_ERR_EPTNULL);//cambiar mensaje
 		return EXIT_FAILURE;
 	}
 
@@ -47,7 +51,7 @@ FILE *fin, *fout, *flog;
 
 	else{
 		if((flog = fopen(arg.logfile_n, "w")) == NULL){
-		fprintf(stderr, "%s\n", MSJ_ERR_INV);//cambiar mensaje
+		fprintf(stderr, "%s\n", MSJ_ERR_OPENL);//cambiar mensaje
 		return EXIT_FAILURE;
 		}
 	}
@@ -58,7 +62,7 @@ FILE *fin, *fout, *flog;
 
 	else{
 		if((fin = fopen(arg.infile_n, "rb")) == NULL){
-		fprintf(flog, "%s\n", MSJ_ERR_INV);//cambiar mensaje
+		fprintf(flog, "%s\n", MSJ_ERR_OPENI);//cambiar mensaje
 		return EXIT_FAILURE;
 		}
 	}
@@ -68,7 +72,7 @@ FILE *fin, *fout, *flog;
 
 	else{
 		if((fout = fopen(arg.outfile_n, "w")) == NULL){
-			fprintf(flog, "%s\n", MSJ_ERR_INV);//cambiar mensaje
+			fprintf(flog, "%s\n", MSJ_ERR_OPENO);//cambiar mensaje
 			return EXIT_FAILURE;
 		}
 	}
@@ -80,6 +84,10 @@ FILE *fin, *fout, *flog;
 
 		
 	}
+
+	printf("name: %s\n", arg.name);
+	printf("protocol: %d\n", arg.protocol);
+	printf("maxlen: %ld\n", arg.maxlen);
 	
 	return EXIT_SUCCESS;
 }
