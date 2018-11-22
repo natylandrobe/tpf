@@ -19,12 +19,12 @@ FILE *fin, *fout, *flog;
 
 	if((st = defaultArgs(&arg)) == ST_EPTNULL){
 		fprintf(stderr, "%s\n", MSJ_ERR_1); //cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	else if(st == ST_ENOMEM){
 		fprintf(stderr, "%s\n", MSJ_ERR_2); //cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	if((st = takeArgs(argc, argv, &arg)) == ST_HELP){
@@ -36,13 +36,13 @@ FILE *fin, *fout, *flog;
 	else if(st == ST_INV){
 
 		fprintf(stderr, "%s\n", MSJ_ERR_INV);//cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	else if(st == ST_EPTNULL){
 
 		fprintf(stderr, "%s\n", MSJ_ERR_EPTNULL);//cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	if(!strcmp(arg.logfile_n, DEFAULT_LOGFILE)){
@@ -52,7 +52,7 @@ FILE *fin, *fout, *flog;
 	else{
 		if((flog = fopen(arg.logfile_n, "w")) == NULL){
 		fprintf(stderr, "%s\n", MSJ_ERR_OPENL);//cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 		}
 	}
 
@@ -63,7 +63,7 @@ FILE *fin, *fout, *flog;
 	else{
 		if((fin = fopen(arg.infile_n, "rb")) == NULL){
 		fprintf(flog, "%s\n", MSJ_ERR_OPENI);//cambiar mensaje
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 		}
 	}
 	if(!strcmp(arg.outfile_n, DEFAULT_OUTFILE)){
@@ -73,7 +73,7 @@ FILE *fin, *fout, *flog;
 	else{
 		if((fout = fopen(arg.outfile_n, "w")) == NULL){
 			fprintf(flog, "%s\n", MSJ_ERR_OPENO);//cambiar mensaje
-			return EXIT_FAILURE;
+			return EXIT_SUCCESS;
 		}
 	}
 

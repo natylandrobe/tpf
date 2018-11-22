@@ -2,20 +2,27 @@
 
 #define MIN_DIG 0
 #define MAX_DIG 9
+#define CANT_ARGS 6
+
+//status_t procesar_arg(int arg, char *argv[], args_t *argp, int argc, size_t index);
+
 /* Lee los argumentos recibidos, verifica que sean correctos y decide que accion tomar segun el argumento */
 
 status_t takeArgs(int argc, char *argv[], struct args *arg){
-	int i, argumento;
+	int argumento;
+	size_t i;
+	//args_t argp;
 
 	if(!argc || !argv || !arg){
 		return ST_EPTNULL;
 	}
 
 	for (i = 1; i < argc; i++){
-		printf("arg: %d\n", i);
+		printf("arg: %ld\n", i);
 		/*se fija si el argumento empieza con '-' */
 		if (*argv[i] == ARG_C){
 			argumento = *(argv[i]+1);
+			//procesar_arg(argumento, argv, argp, argc, i);
 			if(argumento == HELP_C || argumento == toupper(HELP_C) || !strcmp(argv[i], ARG_HELP)){
 				return ST_HELP;
 			}
@@ -28,14 +35,13 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 								return ST_INV;	
 							}
 
-							arg->name = (char *)realloc(arg->name, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->name);
+							arg->name = strdup(argv[i+1]);
 
 							if(arg->name == NULL){
 								free(arg->name);
 								return ST_ENOMEM;
 							}
-
-							strcpy(arg->name, argv[i+1]);
 
 							break;
 
@@ -58,14 +64,14 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 								break;
 							}
 
-							arg->infile_n = (char *)realloc(arg->infile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->infile_n);
+							arg->infile_n = strdup(argv[i+1]);
 
 							if(arg->infile_n == NULL){
 								free(arg->infile_n);
 								return ST_ENOMEM;
 							}
 
-							strcpy(arg->infile_n, argv[i+1]);
 							break;
 
 						case OUTFILE_C:
@@ -74,14 +80,14 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 								break;
 							}
 
-							arg->outfile_n = (char *)realloc(arg->outfile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->outfile_n);
+							arg->outfile_n = strdup(argv[i+1]);
 
 							if(arg->outfile_n == NULL){
 								free(arg->outfile_n);
 								return ST_ENOMEM;
 							}
 
-							strcpy(arg->outfile_n, argv[i+1]);
 							break;
 
 						case LOGFILE_C:
@@ -90,14 +96,14 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 								break;
 							}
 
-							arg->logfile_n = (char *)realloc(arg->logfile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->logfile_n);
+							arg->logfile_n = strdup(argv[i+1]);
 
 							if(arg->logfile_n == NULL){
 								free(arg->logfile_n);
 								return ST_ENOMEM;
 							}
 
-							strcpy(arg->logfile_n, argv[i+1]);
 							break;
 							
 						case MAX_C:
@@ -121,14 +127,13 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							return ST_INV;
 						}
 
-						arg->name = (char *)realloc(arg->name, sizeof(char)*(strlen(argv[i+1])+1));
+						free(arg->name);
+						arg->name = strdup(argv[i+1]);
 
 						if(arg->name == NULL){
 							free(arg->name);
 							return ST_ENOMEM;
 						}
-
-						strcpy(arg->name, argv[i+1]);
 					}
 
 					else if(!strcmp(argv[i], ARG_PROT)){
@@ -153,13 +158,13 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						}
 
 						else{
-							arg->infile_n = (char *)realloc(arg->infile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->infile_n);
+							arg->infile_n = strdup(argv[i+1]);
 
 							if(arg->infile_n == NULL){
 								free(arg->infile_n);
 								return ST_ENOMEM;
 							}
-							strcpy(arg->infile_n, argv[i+1]);
 						}
 					}
 
@@ -170,13 +175,13 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						}
 
 						else{
-							arg->outfile_n = (char *)realloc(arg->outfile_n, sizeof(char)*(strlen(argv[i+1])+1));
+							free(arg->outfile_n);
+							arg->outfile_n = strdup(argv[i+1]);
 
 							if(arg->outfile_n == NULL){
 								free(arg->outfile_n);
 								return ST_ENOMEM;
 							}
-							strcpy(arg->outfile_n, argv[i+1]);
 						}
 					}
 
@@ -187,14 +192,14 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						}
 
 						else{
-							arg->logfile_n = (char *)realloc(arg->logfile_n, sizeof(char)*(strlen(argv[i+1])+1));
-							
+							free(arg->logfile_n);
+							arg->logfile_n = strdup(argv[i+1]);	
+
 							if(arg->logfile_n == NULL){
 								free(arg->logfile_n);
 								return ST_ENOMEM;
 							}
 
-							strcpy(arg->logfile_n, argv[i+1]);
 						}						
 					}
 
@@ -226,5 +231,43 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 	return ST_OK;
 }
 
+/*status_t procesar_arg(int arg, char *argv[], args_t *argp, int argc, size_t index){
+
+	size_t i;
+	char *argumento;
+
+	if(!argv || !argp){
+		return ST_EPTNULL;
+	}
+
+	argumento= (char *)malloc(sizeof(char)*(strlen(argv[index])+1));
+							
+	if(argumento == NULL){
+		return ST_ENOMEM;
+	}
+
+	strcpy(arg->logfile_n, argv[i+1]);
+
+	if(argumento == HELP_C || argumento == toupper(HELP_C) || !strcmp(argv[index], ARG_HELP)){
+				return ST_HELP;
+	}
+
+	else if(argc > index + 1){
+		if(strlen(argv[i]) == 2){
+			switch (tolower(argumento)){
+				case NAME_C:
+		//evaluar casos minuscula
+			}
+		}
+	}
+
+	for(i = 0; i < CANT_ARGS; i++){
+		if(!strcmp(argv[index], dic_args[i]){
+			*argp = i;
+			break;
+		}
+	}
+}
+*/
 
 

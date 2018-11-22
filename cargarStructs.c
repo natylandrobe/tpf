@@ -183,7 +183,8 @@ status_t defaultArgs(struct args *arg){
 
 	arg->protocol = INV;
 
+	srand(time(NULL));
 	arg->maxlen = rand() % RAND_DELIM;
-
+	
 	return ST_OK;
 }
