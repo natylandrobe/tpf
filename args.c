@@ -6,7 +6,7 @@
 #define ARGC_IND 2
 
 const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
-status_t procesar_arg(int argum, char *argv[], args_t *argp, int argc, size_t index);
+status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index);
 
 
 /* Lee los argumentos recibidos, verifica que sean correctos y decide que accion tomar segun el argumento */
@@ -27,7 +27,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 		if (*argv[i] == ARG_C){
 			argumento = *(argv[i]+1);
 
-			if((st = procesar_arg(argumento, argv, &argp, argc, i)) == ST_HELP){
+			if((st = procesar_arg(argumento, argv, &argp, i)) == ST_HELP){
 				return ST_HELP;
 			}
 
@@ -132,7 +132,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 	return ST_OK;
 }
 
-status_t procesar_arg(int argum, char *argv[], args_t *argp, int argc, size_t index){
+status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 
 	size_t i;
 	char *argumento;
