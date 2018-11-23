@@ -11,11 +11,11 @@
 #define DEFAULT_INFILE "stdin"
 #define DEFAULT_OUTFILE "stdout"
 #define DEFAULT_LOGFILE "stderr"
-#define MAX_STR 10
+#define MAX_STR 11
 
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t; 
-//typedef enum{NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN, INVALIDO} args_t;
-//const char dic_args[][MAX_STR] = {"--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
+typedef enum{HELP, NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
+extern const char dic_args[][MAX_STR];
 typedef enum{INV, UBX, NMEA} protocol_t;
 
 struct args {

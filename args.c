@@ -2,16 +2,20 @@
 
 #define MIN_DIG 0
 #define MAX_DIG 9
-#define CANT_ARGS 6
+#define CANT_ARGS 7
+#define ARGC_IND 2
 
-//status_t procesar_arg(int arg, char *argv[], args_t *argp, int argc, size_t index);
+const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
+status_t procesar_arg(int argum, char *argv[], args_t *argp, int argc, size_t index);
+
 
 /* Lee los argumentos recibidos, verifica que sean correctos y decide que accion tomar segun el argumento */
 
 status_t takeArgs(int argc, char *argv[], struct args *arg){
 	int argumento;
 	size_t i;
-	//args_t argp;
+	status_t st;
+	args_t argp;
 
 	if(!argc || !argv || !arg){
 		return ST_EPTNULL;
@@ -22,216 +26,113 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 		/*se fija si el argumento empieza con '-' */
 		if (*argv[i] == ARG_C){
 			argumento = *(argv[i]+1);
-			//procesar_arg(argumento, argv, argp, argc, i);
-			if(argumento == HELP_C || argumento == toupper(HELP_C) || !strcmp(argv[i], ARG_HELP)){
+
+			if((st = procesar_arg(argumento, argv, &argp, argc, i)) == ST_HELP){
 				return ST_HELP;
 			}
 
-			else if(argc > i + 1){
-				if(strlen(argv[i]) == 2){
-					switch (tolower(argumento)){
-						case NAME_C:
-							if(*argv[i+1] == ARG_C){
-								return ST_INV;	
-							}
-
-							free(arg->name);
-							arg->name = strdup(argv[i+1]);
-
-							if(arg->name == NULL){
-								free(arg->name);
-								return ST_ENOMEM;
-							}
-
-							break;
-
-						case PROT_C:
-							if(!strcmp(argv[i+1], PROT_NMEA)){
-								arg->protocol = NMEA;
-							}
-							else if(!strcmp(argv[i+1], PROT_UBX)){
-								arg->protocol = UBX;
-							}
-							else{
-								return ST_INV;
-							}
-							break;
-
-						case INFILE_C:
-
-							if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								printf("argumento in es default\n");
-								break;
-							}
-
-							free(arg->infile_n);
-							arg->infile_n = strdup(argv[i+1]);
-
-							if(arg->infile_n == NULL){
-								free(arg->infile_n);
-								return ST_ENOMEM;
-							}
-
-							break;
-
-						case OUTFILE_C:
-
-							if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								break;
-							}
-
-							free(arg->outfile_n);
-							arg->outfile_n = strdup(argv[i+1]);
-
-							if(arg->outfile_n == NULL){
-								free(arg->outfile_n);
-								return ST_ENOMEM;
-							}
-
-							break;
-
-						case LOGFILE_C:
-
-							if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								break;
-							}
-
-							free(arg->logfile_n);
-							arg->logfile_n = strdup(argv[i+1]);
-
-							if(arg->logfile_n == NULL){
-								free(arg->logfile_n);
-								return ST_ENOMEM;
-							}
-
-							break;
-							
-						case MAX_C:
-							if(checkNum(argv[i+1])){
-								arg->maxlen = strtol(argv[i+1], NULL, 10);
-							}
-
-							else{
-								printf("aca01\n");
-								return ST_INV;
-							}
-					}
-				}
-
-				else if(argumento == ARG_C){
-
-					if(!strcmp(argv[i], ARG_NAME)){
-
+			else if(st == ST_OK && argc > 1+i){
+				switch(argp){
+					case NAME:
 						if(*argv[i+1] == ARG_C){
-							printf("aca02\n");
-							return ST_INV;
+							return ST_INV;	
 						}
 
 						free(arg->name);
-						arg->name = strdup(argv[i+1]);
+						arg->name = strdup(argv[++i]);
 
 						if(arg->name == NULL){
 							free(arg->name);
 							return ST_ENOMEM;
 						}
-					}
+						break;
 
-					else if(!strcmp(argv[i], ARG_PROT)){
+					case PROTOCOL:
 						if(!strcmp(argv[i+1], PROT_NMEA)){
-								arg->protocol = NMEA;
-							}
-
+							arg->protocol = NMEA;
+							i++;
+						}
 						else if(!strcmp(argv[i+1], PROT_UBX)){
 							arg->protocol = UBX;
+							i++;
 						}
-
 						else{
-							printf("aca03\n");
 							return ST_INV;
-							}
-					}
-
-					else if(!strcmp(argv[i], ARG_INFILE)){
-
-						if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								;
 						}
+						break;
 
-						else{
+					case INFILE:
+						if(!strcmp(argv[i+1], DEFAULT_FILE)){
+							i++;
+							break;
+						}
+						free(arg->infile_n);
+						arg->infile_n = strdup(argv[++i]);
+
+						if(arg->infile_n == NULL){
 							free(arg->infile_n);
-							arg->infile_n = strdup(argv[i+1]);
-
-							if(arg->infile_n == NULL){
-								free(arg->infile_n);
-								return ST_ENOMEM;
-							}
+							return ST_ENOMEM;
 						}
-					}
+						break;
 
-					else if(!strcmp(argv[i], ARG_OUTFILE)){
-
+					case OUTFILE:
 						if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								;
+							i++;
+							break;
 						}
 
-						else{
+						free(arg->outfile_n);
+						arg->outfile_n = strdup(argv[++i]);
+
+						if(arg->outfile_n == NULL){
 							free(arg->outfile_n);
-							arg->outfile_n = strdup(argv[i+1]);
+							return ST_ENOMEM;
+						}
 
-							if(arg->outfile_n == NULL){
-								free(arg->outfile_n);
-								return ST_ENOMEM;
+						break;
+
+					case LOGFILE:
+							if(!strcmp(argv[i+1], DEFAULT_FILE)){
+								i++;
+								break;
 							}
-						}
-					}
 
-					else if(!strcmp(argv[i], ARG_LOGFILE)){
-
-						if(!strcmp(argv[i+1], DEFAULT_FILE)){
-								;
-						}
-
-						else{
 							free(arg->logfile_n);
-							arg->logfile_n = strdup(argv[i+1]);	
+							arg->logfile_n = strdup(argv[++i]);
 
 							if(arg->logfile_n == NULL){
 								free(arg->logfile_n);
 								return ST_ENOMEM;
 							}
 
-						}						
-					}
-
-					else if(!strcmp(argv[i], ARG_MAX)){
+							break;
+					case MAXLEN:
 
 						if(checkNum(argv[i+1])){
-							arg->maxlen = strtol(argv[i+1], NULL, 10);
-						}
+								arg->maxlen = strtol(argv[++i], NULL, 10);
+							}
 
 						else{
-							printf("aca04\n");
 							return ST_INV;
 						}
-					}
 
-					else{
-						printf("aca05\n");
-						return ST_INV;
-
-					}
-						
 				}
-
 			}
-
+			else{
+				if(!(argc > 1+i)){
+					return ST_INV;
+				}
+				return st;
+			}
+		}
+		else{
+			return ST_INV;
 		}
 	}
-
 	return ST_OK;
 }
 
-/*status_t procesar_arg(int arg, char *argv[], args_t *argp, int argc, size_t index){
+status_t procesar_arg(int argum, char *argv[], args_t *argp, int argc, size_t index){
 
 	size_t i;
 	char *argumento;
@@ -240,34 +141,45 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 		return ST_EPTNULL;
 	}
 
-	argumento= (char *)malloc(sizeof(char)*(strlen(argv[index])+1));
+	if(strlen(argv[index]) == 2){
+		argum = tolower(argum);
+		for(i = 0; i < CANT_ARGS; i++){
+
+			if(argum == dic_args[i][ARGC_IND]){
+				*argp = i;
+				if(*argp == HELP){
+					return ST_HELP;
+				}
+				return ST_OK;
+			}
+			
+		}
+		return ST_INV;
+	}
+
+	else if(argum == ARG_C){
+
+		argumento = strdup(argv[index]);
 							
-	if(argumento == NULL){
-		return ST_ENOMEM;
-	}
+		if(argumento == NULL){
+			return ST_ENOMEM;
+		}
 
-	strcpy(arg->logfile_n, argv[i+1]);
-
-	if(argumento == HELP_C || argumento == toupper(HELP_C) || !strcmp(argv[index], ARG_HELP)){
-				return ST_HELP;
-	}
-
-	else if(argc > index + 1){
-		if(strlen(argv[i]) == 2){
-			switch (tolower(argumento)){
-				case NAME_C:
-		//evaluar casos minuscula
+		for(i = 0; i < CANT_ARGS; i++){
+			if(!strcmp(argv[index], dic_args[i])){
+				*argp = i;
+		
+				if(*argp == HELP){
+					return ST_HELP;
+				}
+				return ST_OK;
 			}
 		}
+
+		return ST_INV;
 	}
 
-	for(i = 0; i < CANT_ARGS; i++){
-		if(!strcmp(argv[index], dic_args[i]){
-			*argp = i;
-			break;
-		}
-	}
+	return ST_INV;
 }
-*/
 
 

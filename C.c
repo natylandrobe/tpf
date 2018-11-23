@@ -8,6 +8,7 @@
 #define MSJ_ERR_OPENL "no se pudo abrir logfile"
 #define MSJ_ERR_OPENI "no se pudo abrir infile"
 #define MSJ_ERR_OPENO "no se pudo abrir outfile"
+#define MSJ_ERR_ENOMEM "no hay memoria en takeargs"
 
 int main (int argc, char *argv[]){
 FILE *fin, *fout, *flog;
@@ -42,6 +43,11 @@ FILE *fin, *fout, *flog;
 	else if(st == ST_EPTNULL){
 
 		fprintf(stderr, "%s\n", MSJ_ERR_EPTNULL);//cambiar mensaje
+		return EXIT_SUCCESS;
+	}
+	else if(st == ST_ENOMEM){
+
+		fprintf(stderr, "%s\n", MSJ_ERR_ENOMEM);//cambiar mensaje
 		return EXIT_SUCCESS;
 	}
 
