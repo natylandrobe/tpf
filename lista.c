@@ -15,17 +15,56 @@ typedef struct nodo{
 	struct nodo *sig;
 } nodo_t;
 
+typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM, ST_EAGR} status_t; //desp incluir el .h de donde este
+
 typedef struct nodo *lista_t;
 struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const double lon, const double ele);
+struct trkpt *proc_sentencias(void * dato, sent_t tipo);
+nodo_t *crear_nodo(void *dato, struct trkpt *(*procesar)(void *, sent_t), sent_t tipo);
+status_t agregar_nodo(void * dato, lista_t *l, sent_t tipo);
 
-struct trkpt *proc_gga(struct s_GGA * dato){
-	if(!dato){
+status_t agregar_nodo(void * dato, lista_t *l, sent_t tipo){
+	nodo_t *temp, *aux;
+	if(!dato || !l){
+		return ST_EPTNULL;
+	}
+	if((aux = crear_nodo(dato, &proc_sentencias, tipo)) == NULL){
+		return ST_EAGR;
+	}
+	if((*l) == NULL){
+		*l = aux;
+	}
+	else{
+		temp = *l;
+		while((temp = temp->sig))
+			;
+
+		temp->sig = aux;
+	}
+	return ST_OK;
+}
+
+nodo_t *crear_nodo(void *dato, struct trkpt *(*procesar)(void *, sent_t), sent_t tipo){
+	nodo_t *pn;
+	
+	if(!dato || !procesar){
 		return NULL;
 	}
 
-	return cargar_trkpt(&(dato->f), dato->lat, dato->lon, dato->ele);
-}
+	pn = (nodo_t *)malloc(sizeof(nodo_t));
+	if(!pn){
+		return NULL;
+	}
 
+	if(!(pn->mensaje = (*procesar)(dato, tipo))){
+		free(pn);
+		pn = NULL;
+		return NULL;
+	}
+	pn->sig = NULL;
+
+	return pn;
+}
 
 struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const double lon, const double ele){
 	struct trkpt *aux;
@@ -46,3 +85,25 @@ struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const do
 	
 	return aux;
 }
+
+struct trkpt *proc_sentencias(void * dato, sent_t tipo){
+	if(!dato){
+		return NULL;
+	}
+
+	switch(tipo){
+		case GGA:
+			return cargar_trkpt(&(((struct s_GGA *) dato)->f), ((struct s_GGA *) dato)->lat, ((struct s_GGA *) dato)->lon, ((struct s_GGA *) dato)->ele);
+		case RMC:
+			return cargar_trkpt(&(((struct s_RMC *) dato)->f), ((struct s_RMC *) dato)->lat, ((struct s_RMC *) dato)->lon, DEF_ELE);
+		case NAV_PVT:
+			return cargar_trkpt(&(((struct s_PVT *) dato)->f), ((struct s_PVT *) dato)->lat, ((struct s_PVT *) dato)->lon, ((struct s_PVT *) dato)->hmsl);
+		case NAV_POSLLH:
+			return cargar_trkpt(&(((struct s_POSLLH *) dato)->f), ((struct s_POSLLH *) dato)->lat, ((struct s_POSLLH *) dato)->lon, ((struct s_POSLLH *) dato)->hmsl);
+		default:
+			return NULL;
+	}
+
+	
+}
+

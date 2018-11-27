@@ -90,7 +90,7 @@
 
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t;
 
-typedef enum {GGA,RMC,ZDA,NING}tipo_nmea;
+typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH, NING} sent_t;
 
 struct fecha {
         int dia;
@@ -102,7 +102,7 @@ struct fecha {
 };
 
 
-struct GGA{
+struct s_GGA{
         char tipo[TIPO_LEN];
         struct fecha f;
         double lat;
@@ -114,7 +114,7 @@ struct GGA{
         long int cantSat;
 };
 
-struct RMC{
+struct s_RMC{
         char tipo[TIPO_LEN];
         struct fecha f;
         char status;
@@ -122,7 +122,7 @@ struct RMC{
         double lon;
 };
 
-struct ZDA{
+struct s_ZDA{
         char tipo[TIPO_LEN];
         struct fecha f;
         int time_zone;
@@ -146,7 +146,7 @@ unsigned char nmea_checksum(const char * s){
 
 // verifica que tipo de nma es
 
-tipo_nmea checkLine(char *s){
+sent_t checkLine(char *s){
 
 	char checkSum[CANT_CSUM];
 
@@ -323,7 +323,7 @@ cal_t convertirCal(long int cal){
         }
 }
 
-bool cargar_struct_gga(char *s,struct GGA *Gga,struct fecha *date){
+bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
 
 
         char *str, *check;
@@ -417,7 +417,7 @@ bool checkMembersrmc(double lat, double lon){
 
 
 
-bool cargar_struct_rmc(char *s,struct RMC *Rmc,struct fecha *date){
+bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 
         char *str, *check;
         char status;
@@ -476,7 +476,7 @@ bool cargar_struct_rmc(char *s,struct RMC *Rmc,struct fecha *date){
         return true;
 }
 
-bool cargar_struct_zda(char *s,struct ZDA *Zda,struct fecha *date){
+bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
         char *str, *check;
@@ -553,13 +553,13 @@ bool cargar_struct_zda(char *s,struct ZDA *Zda,struct fecha *date){
 
 int main(void){
 
-	struct RMC Rmc;
-	struct GGA Gga;
-	struct ZDA Zda;
+	struct s_RMC Rmc;
+	struct s_GGA Gga;
+	struct s_ZDA Zda;
 	struct fecha fecha;
 
 	char linea[MAX_LINE];
-	tipo_nmea t;
+	sent_t t;
 	while (fgets(linea, MAX_LINE, stdin) != NULL){
 		t=checkLine(linea);
 		switch (t){

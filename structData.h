@@ -19,7 +19,7 @@ typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rt
 typedef enum{HELP, NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
 extern const char dic_args[][MAX_STR];
 typedef enum{INV, UBX, NMEA} protocol_t;
-typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH} sent_t;
+typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH, NING} sent_t;
 
 struct args {
 	char *name;
@@ -63,6 +63,7 @@ struct s_GGA{
 	long int cantSat;
 };
 
+
 struct s_RMC{
 	sent_t tipo;
 	struct fecha f;
@@ -76,6 +77,37 @@ struct s_ZDA{
 	struct fecha f;
 	int time_zone;
 	int dif_tmzone;
+};
+
+struct s_PVT{
+	unsigned int iTOW;
+	struct fecha f;
+	unsigned char valid;
+	unsigned char fix;
+	unsigned char flags;
+	unsigned char numSV;
+	int lon;
+	int lat;
+	int hmsl;
+	int pDOP;
+};
+
+struct s_POSLLH{
+	unsigned int iTOW;
+	struct fecha f;
+	int lon;
+	int lat;
+	int hmsl;
+	int hAcc;
+	int vAcc;
+};
+
+struct s_TIM_TOS{
+	unsigned char version;
+	unsigned char gnss;
+	struct fecha f;
+	unsigned int week;
+	unsigned int tow;
 };
 
 
