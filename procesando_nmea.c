@@ -14,6 +14,9 @@
 
 #define TIPO_LEN 3
 
+#define AUX_PARA_HOR_MIN_SEG 10000
+#define AUX_PARA_MIN_SEG 100
+
 #define CHECK_GGA "$GPGGA,"
 #define CHECK_RMC "$GPRMC,"
 #define CHECK_ZDA "$GPZDA,"
@@ -68,6 +71,8 @@
 #define ERR_CAL 9
 
 //para el rmc
+#define COMPARE_RMC_STATUS_ACT "A"
+#define COMPARE_RMC_STATUS_VOID "V"
 #define CANT_TOKEN_RMC 10
 #define INDEX_LAT_RMC 3
 #define INDEX_LAT_CARD_RMC 4
@@ -87,7 +92,6 @@
 #define INDEX_TIME_ZONE_ZDA 5
 #define INDEX_DIF_TIME_ZONE_ZDA 6
 
-
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t;
 
 typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH, NING} sent_t;
@@ -103,7 +107,7 @@ struct fecha {
 
 
 struct s_GGA{
-        char tipo[TIPO_LEN];
+        sent_t tipo;
         struct fecha f;
         double lat;
         double lon;
@@ -115,7 +119,7 @@ struct s_GGA{
 };
 
 struct s_RMC{
-        char tipo[TIPO_LEN];
+        sent_t tipo;
         struct fecha f;
         char status;
         double lat;
@@ -123,7 +127,7 @@ struct s_RMC{
 };
 
 struct s_ZDA{
-        char tipo[TIPO_LEN];
+        sent_t tipo;
         struct fecha f;
         int time_zone;
         int dif_tmzone;
@@ -179,7 +183,7 @@ bool checkMembers(double lat, double lon, cal_t cal, long int cant){
 
         return !(lat  > MAX_LAT  || lat  < -MAX_LAT      ||
                          lon  > MAX_LON  || lon  < -MAX_LON      ||
-                         cal  > MAX_CAL  || cal  <  MIN_CAL_CANT ||
+                         cal  > MAX_CAL  || cal  <  MIN_CAL_CANT || cal==invalido ||
                          cant > MAX_CANT || cant <  MIN_CAL_CANT);
 }
 
@@ -333,9 +337,9 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
         double horario;
         cal_t calidad;
 
-     //   if(!s || !newS){
-       //         return false;
-        //}
+       if(!s ){
+             return false;
+    	}
 
         str = strtok(s, DELIM);
         int i = 0;
@@ -390,13 +394,10 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
                 return false;
         }
 
-        //Gga->f= date;
-
-
-        date->hora= horario/10000;
-        date->minutos = ((int)horario%10000)/100;
-        //falta ver los decimales de segundos
-        date->segundos = ((int)horario%100);
+  		Gga->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
+        Gga->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
+        Gga->f.segundos = horario-Gga->f.hora*AUX_PARA_HOR_MIN_SEG-Gga->f.minutos*AUX_PARA_MIN_SEG;
+        *date=Gga->f;
         Gga->lat = lat;
         Gga->lon = lon;
         Gga->calidad = calidad;
@@ -421,14 +422,13 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 
         char *str, *check;
         char status;
-        double stat;
         char *tokens[CANT_TOKEN_RMC];
         double lat, lon;
         double horario;
        
-     //   if(!s || !newS){
-       //         return false;
-        //}
+     	if(!s){
+                return false;
+        }
 
         str = strtok(s, DELIM);
         int i = 0;
@@ -444,18 +444,15 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
                 return false;
         }
 
-        stat=strtod(tokens[INDEX_STATUS_RMC], &check);
-        
-        if(*check != END_STR){
-        	//esto es solo una prueba de que esto se cumple
-        	printf("%s\n","ERROR");
-        	//no se porque si desmarco esto retorna false
-              //return false;
-        }
-        if (stat==65.00)
+        if (strcmp(tokens[INDEX_STATUS_RMC],COMPARE_RMC_STATUS_ACT)==0){
         	status='A';
-        if(stat==86.00)
-		status='V';
+        }
+
+        
+        if(strcmp(tokens[INDEX_STATUS_RMC],COMPARE_RMC_STATUS_VOID)==0){
+			status='V';
+			return false;
+        }
 
 
         lat = convertirLat(tokens[INDEX_LAT_RMC], tokens[INDEX_LAT_CARD_RMC]);
@@ -465,10 +462,10 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
                 return false;
         }
 		
-		date->hora= horario/10000;
-        date->minutos = ((int)horario%10000)/100;
-        //falta ver los decimales de segundos
-        date->segundos = ((int)horario%100);    
+        Rmc->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
+        Rmc->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
+        Rmc->f.segundos = horario-Rmc->f.hora*AUX_PARA_HOR_MIN_SEG-Rmc->f.minutos*AUX_PARA_MIN_SEG;
+        *date= Rmc->f;  
         Rmc->lat = lat;
         Rmc->lon = lon;
         Rmc->status= status;
@@ -482,13 +479,12 @@ bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
         char *str, *check;
         char *tokens[CANT_TOKEN];
         double time_zone,dif_tmzone,horario;
-        //double aux=10000;
         double dia,mes,anio;
        
 
-     //   if(!s || !newS){
-       //         return false;
-        //}
+       if(!s ){
+               return false;
+        }
 
         str = strtok(s, DELIM);
         int i = 0;
@@ -535,14 +531,17 @@ bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
                 return false;
         }*/
 
-        //Zda->f=date;
-        date->dia =dia;
-        date->mes = mes;
-        date->anio = anio;
-        date->hora= horario/10000;
-        date->minutos = ((int)horario%10000)/100;
-        //falta ver los decimales de segundos
-        date->segundos = ((int)horario%100);
+        // por que el zda tiene que actualizar la fecha
+        if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio))
+        	return false ;
+
+        Zda->f.dia =dia;
+        Zda->f.mes = mes;
+        Zda->f.anio = anio;
+        Zda->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
+        Zda->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
+        Zda->f.segundos = horario-Zda->f.hora*AUX_PARA_HOR_MIN_SEG-Zda->f.minutos*AUX_PARA_MIN_SEG;
+        *date=Zda->f;
         Zda->time_zone = time_zone;
         Zda->dif_tmzone = dif_tmzone;
         
@@ -565,25 +564,25 @@ int main(void){
 		switch (t){
 		case GGA : if ( cargar_struct_gga(linea,&Gga,&fecha)){
 		printf("%s\n","BIENGGA");
-		printf("%f\n",Gga.lat);
-		printf("%f\n",Gga.lon);
-		printf("%f\n",Gga.ele);
-		printf("%f\n",Gga.hdop);
-		printf("%f\n",Gga.separacion);
+		printf("%.3f\n",Gga.lat);
+		printf("%.3f\n",Gga.lon);
+		printf("%.1f\n",Gga.ele);
+		printf("%.1f\n",Gga.hdop);
+		printf("%.1f\n",Gga.separacion);
 		printf("%li\n",Gga.cantSat);
 		printf("%i\n",fecha.hora);
 		printf("%i\n",fecha.minutos);
-		printf("%f\n",fecha.segundos);
+		printf("%.3f\n",fecha.segundos);
 							} break;
 		case RMC :
 		if (cargar_struct_rmc(linea,&Rmc,&fecha)){
 		printf("%s\n","BIENRM");
-		printf("%f\n",Rmc.lat);
-		printf("%f\n",Rmc.lon);
+		printf("%.3f\n",Rmc.lat);
+		printf("%.3f\n",Rmc.lon);
 		printf("%c\n",Rmc.status);
 		printf("%i\n",fecha.hora);
 		printf("%i\n",fecha.minutos);
-		printf("%f\n",fecha.segundos);							}
+		printf("%.3f\n",fecha.segundos);							}
 						 break;
 		case ZDA :
 		if(cargar_struct_zda(linea,&Zda,&fecha)){
