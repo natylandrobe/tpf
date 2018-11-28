@@ -16,6 +16,7 @@
 
 #define TIPO_LEN 3
 
+typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM, ST_EAGR} status_t;
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t; 
 typedef enum{HELP, NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
 extern const char dic_args[][MAX_STR];

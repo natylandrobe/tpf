@@ -5,7 +5,6 @@
 #include "structData.h"
 #endif
 
-typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM} status_t;
 
 bool checkLine(char *s); 
 bool checkDia(int dia); 

@@ -9,7 +9,6 @@ typedef struct nodo{
 	struct nodo *sig;
 } nodo_t;
 
-typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM, ST_EAGR} status_t; //desp incluir el .h de donde este
 
 typedef struct nodo *lista_t;
 struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const double lon, const double ele);
