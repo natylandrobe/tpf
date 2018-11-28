@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+
 #define DEFAULT_NAME "Default Name"
 #define DEFAULT_INFILE "stdin"
 #define DEFAULT_OUTFILE "stdout"
@@ -39,17 +40,6 @@ struct fecha {
 	float segundos;
 };
 
-//va a pasar a ser struct GGA
-struct data {
-	struct fecha f;
-	double lat;
-	double lon;
-	double ele;
-	double hdop;
-	double separacion;
-	cal_t calidad;
-	long int cantSat;
-};
 
 struct s_GGA{
 	sent_t tipo;
@@ -108,6 +98,13 @@ struct s_TIM_TOS{
 	struct fecha f;
 	unsigned int week;
 	unsigned int tow;
+};
+
+struct trkpt{
+	struct fecha f;
+	double lat;
+	double lon;
+	double ele;
 };
 
 

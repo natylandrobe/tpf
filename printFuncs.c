@@ -47,19 +47,19 @@ void printTrkC(void){
 }
 
 /* Imprime la estructura en formato XML */
-void printStruct(struct data track){
+void printStruct(struct trkpt *track){
 
 	printf("%s%s%f%s%f%s\n%s%s%s%f%s\n%s%s%s%d-%d-%d%s%d:%d:%.3f%s%s\n%s%s\n",
 		SPC3, TRKPT_START,
-		track.lat,
+		track->lat,
 		TRKPT_MID,
-		track.lon,
+		track->lon,
 		TRKPT_FIN,
 		SPC3, SPC, ELE,
-		track.ele,
+		track->ele,
 		ELE_C,
-		SPC3, SPC, TIME,track.f.anio, track.f.mes, track.f.dia,
-		T,track.f.hora,track.f.minutos,track.f.segundos,
+		SPC3, SPC, TIME,track->f.anio, track->f.mes, track->f.dia,
+		T,track->f.hora,track->f.minutos,track->f.segundos,
 		Z, TIME_C,
 		SPC3, TRKPT_C);
 }

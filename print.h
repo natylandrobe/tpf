@@ -5,9 +5,10 @@
 #include "structData.h"
 #endif
 
+
 bool printMetadata(char *name);
 void printTrkC(void);
-void printStruct(struct data track);
+void printStruct(struct trkpt *track);
 void printHelp(void);
 
 #endif
