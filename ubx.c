@@ -65,7 +65,7 @@ ubxst_t procesar_ubx(FILE *fin){
 	}
 
 	largo = calc_largo(info_largo);
-
+	
 	
 
 }
