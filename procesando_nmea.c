@@ -43,7 +43,7 @@
 #define END_STR '\0'
 
 #define DELIM ","
-#define CANT_TOKEN 15
+#define CANT_TOKEN_GGA 15
 #define INDEX_HORARIO_GGA 1
 #define INDEX_LAT 2
 #define INDEX_LAT_CARD 3
@@ -83,14 +83,16 @@
 #define INDEX_STATUS_RMC 2
 
 //para el zda
-
+#define DELIM_AUX_ZDA "*"
 #define CANT_TOKEN_ZDA 6
+#define CANT_TOKEN_AUX_ZDA 2
 #define INDEX_HORARIO_ZDA 1 
 #define INDEX_DIA_ZDA 2
 #define INDEX_MES_ZDA 3 
 #define INDEX_ANIO_ZDA 4
 #define INDEX_TIME_ZONE_ZDA 5
-#define INDEX_DIF_TIME_ZONE_ZDA 6
+#define INDEX_DIF_TIME_ZONE_AUX_ZDA 6
+#define INDEX_DIF_TIME_ZONE_ZDA 0
 
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t;
 
@@ -331,7 +333,7 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
 
 
         char *str, *check;
-        char *tokens[CANT_TOKEN];
+        char *tokens[CANT_TOKEN_GGA];
         double lat, lon, hdop, ele, separacion;
         long int cal, cant;
         double horario;
@@ -477,10 +479,9 @@ bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
         char *str, *check;
-        char *tokens[CANT_TOKEN];
-        double time_zone,dif_tmzone,horario;
-        double dia,mes,anio;
-       
+        char *tokens[CANT_TOKEN_ZDA],*token[CANT_TOKEN_AUX_ZDA];
+        double time_zone,dif_tmzone;
+        double dia,mes,anio,horario;
 
        if(!s ){
                return false;
@@ -520,20 +521,27 @@ bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
                 return false;
         }
 
-        time_zone = strtol(tokens[INDEX_TIME_ZONE_ZDA], &check, 10);
+        time_zone = strtod(tokens[INDEX_TIME_ZONE_ZDA], &check);
 
         if(*check != END_STR){
                 return false;
         }
-        dif_tmzone = strtol(tokens[INDEX_DIF_TIME_ZONE_ZDA], &check, 10);
-        // No se porque si desmarco esto , retorna falso
-        /*if(*check != END_STR){
-                return false;
-        }*/
+        str= strtok(tokens[INDEX_DIF_TIME_ZONE_AUX_ZDA],DELIM_AUX_ZDA);
+                i = 0;
+        while(str != NULL){
+                token[i] = str;
+                str = strtok(NULL,DELIM_AUX_ZDA);
+                i++;
+        }
+        dif_tmzone = strtod(token[INDEX_DIF_TIME_ZONE_ZDA], &check);
 
+       if(*check != END_STR){
+                return false;
+        }
         // por que el zda tiene que actualizar la fecha
-        if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio))
+        if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio)){
         	return false ;
+        }
 
         Zda->f.dia =dia;
         Zda->f.mes = mes;
@@ -543,7 +551,7 @@ bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date){
         Zda->f.segundos = horario-Zda->f.hora*AUX_PARA_HOR_MIN_SEG-Zda->f.minutos*AUX_PARA_MIN_SEG;
         *date=Zda->f;
         Zda->time_zone = time_zone;
-        Zda->dif_tmzone = dif_tmzone;
+        Zda->dif_tmzone =dif_tmzone;
         
         return true;
 }
@@ -593,7 +601,7 @@ int main(void){
 		printf("%i\n",fecha.anio);
 		printf("%i\n",fecha.hora);
 		printf("%i\n",fecha.minutos);
-		printf("%f\n",fecha.segundos);
+		printf("%.3f\n",fecha.segundos);
 		printf("%i\n",Zda.time_zone);
 		printf("%i\n",Zda.dif_tmzone);
 				 }
