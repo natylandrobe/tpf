@@ -81,7 +81,7 @@ ubxst_t procesar_ubx(FILE *fin){
 
 	largo = calc_largo(info_largo);
 	
-	if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS) || (id == POSLLH_ID && largo != POSLLH_L)){
+	if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS_L) || (id == POSLLH_ID && largo != POSLLH_L)){
 		return S_LARGO_INV;
 	}
 
