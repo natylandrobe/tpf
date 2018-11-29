@@ -157,7 +157,7 @@ ubxst_t ubx_cksum(char *ckBuff, int n, FILE *fin){
 	unsigned char ck_a = 0;
 	unsigned char ck_b = 0;
 	size_t i;
-	char cksum[LARGO_CK_SZ];
+	unsigned char cksum[LARGO_CK_SZ];
 
 	if(!ckBuff || !fin){
 		return S_EPTNULL;
