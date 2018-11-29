@@ -1,0 +1,14 @@
+1_ubx-nav-pvt.ubx: 1 mensaje de tipo UBX-NAV-PVT
+1_ubx-nav-pvt_err.ubx: 1 mensaje de tipo UBX-NAV-PVT con 1 error
+2_ubx-tim-tos.ubx: 2 mensajes de tipo UBX-TIM-TOS
+3_ubx-nav-posllh.ubx: 3 mensajes de tipo UBX-NAV-POSLLH
+ubx-nav-posllh.ubx: varios mensajes de tipo UBX-NAV-POSLLH
+ubx-nav-posllh_short.ubx: varios mensajes de tipo UBX-NAV-POSLLH con errores
+ubx-nav-pvt.ubx: varios mensajes de tipo UBX-NAV-PVT
+ubx-tim-tos.ubx: varios mensajes de tipo UBX-TIM-TOS
+fiuba.nmea: log nmea del tp anterior PERO CON SENTENCIAS ZDA
+fiuba.ubx: idem anterior pero bajo el protocolo UBX
+travesia.nmea: log nmea del tp anterior PERO CON SENTENCIAS ZDA
+travesia.ubx: idem anterior pero bajo el protocolo UBX
+travesia_short.ubx: idem anterior pero con errores
+travesia_long.ubx: idem anterior pero con otros errores
