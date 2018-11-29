@@ -71,8 +71,10 @@
 #define ERR_CAL 9
 
 //para el rmc
-#define COMPARE_RMC_STATUS_ACT "A"
-#define COMPARE_RMC_STATUS_VOID "V"
+#define STATUS_RMC_ACT 'A'
+#define STATUS_RMC_VOID 'V'
+#define COMPARE_STATUS_RMC_ACT "A"
+#define COMPARE_STATUS_RMC_VOID "V"
 #define CANT_TOKEN_RMC 10
 #define INDEX_LAT_RMC 3
 #define INDEX_LAT_CARD_RMC 4
@@ -446,16 +448,14 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
                 return false;
         }
 
-        if (strcmp(tokens[INDEX_STATUS_RMC],COMPARE_RMC_STATUS_ACT)==0){
-        	status='A';
-        }
-
-        
-        if(strcmp(tokens[INDEX_STATUS_RMC],COMPARE_RMC_STATUS_VOID)==0){
-			status='V';
+        if(strcmp(tokens[INDEX_STATUS_RMC],COMPARE_STATUS_RMC_VOID)==0){
+			status=STATUS_RMC_VOID;
 			return false;
         }
 
+        if (strcmp(tokens[INDEX_STATUS_RMC],COMPARE_STATUS_RMC_ACT)==0){
+        	status=STATUS_RMC_ACT;
+        }
 
         lat = convertirLat(tokens[INDEX_LAT_RMC], tokens[INDEX_LAT_CARD_RMC]);
         lon = convertirLon(tokens[INDEX_LON_RMC], tokens[INDEX_LON_CARD_RMC]);
