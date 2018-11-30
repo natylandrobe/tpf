@@ -4,8 +4,14 @@
 #include "check.h"
 #include <sys/time.h>
 
+#define END_STR '\0'
+#define AUX_PARA_HOR_MIN_SEG 10000
+#define AUX_PARA_MIN_SEG 100
+
+//para el GGA
 #define DELIM ","
-#define CANT_TOKEN 15
+#define CANT_TOKEN_GGA 15
+#define INDEX_HORARIO_GGA 1
 #define INDEX_LAT 2
 #define INDEX_LAT_CARD 3
 #define INDEX_LON 4
@@ -15,7 +21,32 @@
 #define INDEX_HDOP 8
 #define INDEX_ELE 9
 #define INDEX_SEP 11
-#define END_STR '\0'
+
+//para el RMC
+#define STATUS_RMC_ACT 'A'
+#define STATUS_RMC_VOID 'V'
+#define COMPARE_STATUS_RMC_ACT "A"
+#define COMPARE_STATUS_RMC_VOID "V"
+#define CANT_TOKEN_RMC 10
+#define INDEX_LAT_RMC 3
+#define INDEX_LAT_CARD_RMC 4
+#define INDEX_LON_RMC 5 
+#define INDEX_LON_CARD_RMC 6
+#define INDEX_FECHA_RMC 9
+#define INDEX_HORARIO_RMC 1
+#define INDEX_STATUS_RMC 2
+
+//Para el ZDA
+#define CANT_TOKEN_ZDA 6
+#define CANT_TOKEN_AUX_ZDA 2
+#define INDEX_HORARIO_ZDA 1 
+#define INDEX_DIA_ZDA 2
+#define INDEX_MES_ZDA 3 
+#define INDEX_ANIO_ZDA 4
+#define INDEX_TIME_ZONE_ZDA 5
+#define INDEX_DIF_TIME_ZONE_AUX_ZDA 6
+#define INDEX_DIF_TIME_ZONE_ZDA 0
+
 
 #define MICROSEC 1000000.0 
 #define YEAR_DIFF 1900 
@@ -29,6 +60,9 @@
 double convertirLon(const char lon[], char * cardinal);
 double convertirLat(const char lat[], char * cardinal);
 cal_t convertirCal(long int cal);
+bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
+bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);
+bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date);
 
 #endif
 

@@ -1,24 +1,33 @@
 #include "defCheck.h"
 
-/* Verifica que la linea sea $GPGGA y que la suma de verificacion sea correcta */
-bool checkLine(char *s){
+/*verifica que tipo de nma es*/
+
+sent_t checkLine(char *s){
 
 	char checkSum[CANT_CSUM];
 
 	if(!s){
 		
-		return false;
+		return NING;
 	}
 
 	/* Asumimos que todas las lineas traen '*' */
 	checkSum[0] = *(strrchr(s, ASTERISCO) + 1);
 	checkSum[1] = *(strrchr(s, ASTERISCO) + 2);
 
-	if(strstr(s, CHECK) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	if(strstr(s, CHECK_GGA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
 	
-		return true;
+		return GGA;
 	}
-	return false;
+	if(strstr(s, CHECK_RMC) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	
+		return RMC;
+	}
+	if(strstr(s, CHECK_ZDA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	
+		return ZDA;
+	}
+	return NING;
 }
 
 /* Calcula la suma de verificacion */
@@ -38,10 +47,17 @@ unsigned char nmea_checksum(const char * s){
 /* Verifica que los datos recibidos sean validos */
 bool checkMembers(double lat, double lon, cal_t cal, long int cant){
 
-	return !(lat  > MAX_LAT  || lat  < -MAX_LAT      ||
-			 lon  > MAX_LON  || lon  < -MAX_LON      ||
-			 cal  > MAX_CAL  || cal  <  MIN_CAL_CANT ||
-			 cant > MAX_CANT || cant <  MIN_CAL_CANT);
+        return !(lat  > MAX_LAT  || lat  < -MAX_LAT      ||
+                         lon  > MAX_LON  || lon  < -MAX_LON      ||
+                         cal  > MAX_CAL  || cal  <  MIN_CAL_CANT || cal==invalido ||
+                         cant > MAX_CANT || cant <  MIN_CAL_CANT);
+}
+
+/*verifica que los datos recividos sean validos*/
+bool checkMembersrmc(double lat, double lon){
+
+        return !(lat  > MAX_LAT  || lat  < -MAX_LAT      ||
+                         lon  > MAX_LON  || lon  < -MAX_LON );
 }
 
 /* Verifica que el numero de dia sea valido */
@@ -81,3 +97,5 @@ bool checkNum(char *s){
 	}
 	return true;
 }
+
+
