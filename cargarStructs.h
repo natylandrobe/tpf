@@ -64,6 +64,7 @@ cal_t convertirCal(long int cal);
 bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
 bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);
 bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date);
+status_t defaultFecha(struct fecha *def);
 
 #endif
 

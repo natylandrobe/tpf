@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "funcmain.h"
+#include "ubx.h"
+#include "cargarStructs.h"
 
 #define MSJ_ERR_1 "puntero nulo en defaultArgs"
 #define MSJ_ERR_2 "no mem en defaultArgs"
@@ -19,9 +21,16 @@ FILE *fin, *fout, *flog;
 	char linea[MAX_LINE];
 	struct args arg;
 	//struct data track;	
-	//struct fecha date;
 	status_t st;
 	sent_t t;
+	size_t i = 0;
+	lista_t lista;
+	ubxst_t proc_ubx;
+
+	if(defaultFecha(&fecha) != ST_OK){
+		printf("default fecha error\n");
+		return EXIT_SUCCESS;
+	}
 
 	if((st = defaultArgs(&arg)) == ST_EPTNULL){
 		fprintf(stderr, "%s\n", MSJ_ERR_1); //cambiar mensaje
@@ -88,6 +97,15 @@ FILE *fin, *fout, *flog;
 		}
 	}
 
+	printf("name: %s\n", arg.name);
+	printf("protocol: %d\n", arg.protocol);
+	printf("maxlen: %ld\n", arg.maxlen);
+
+	if(crear_lista(&lista) != ST_OK){
+		fprintf(flog, "%s", "no se pudo crear la lista");
+		return EXIT_SUCCESS;
+	}
+
 	if (arg.protocol==NMEA){
 	// este while es para hacer pruebas, no es parte del programa
 		while(fgets(linea, MAX_LINE, fin)){
@@ -118,7 +136,8 @@ FILE *fin, *fout, *flog;
 			printf("%c\n",Rmc.status);
 			printf("%i\n",fecha.hora);
 			printf("%i\n",fecha.minutos);
-			printf("%.3f\n",fecha.segundos);							}
+			printf("%.3f\n",fecha.segundos);							
+			}
 						 break;
 			case ZDA :
 			if(cargar_struct_zda(linea,&Zda,&fecha)){
@@ -132,24 +151,47 @@ FILE *fin, *fout, *flog;
 			printf("%.3f\n",fecha.segundos);
 			printf("%i\n",Zda.time_zone);
 			printf("%i\n",Zda.dif_tmzone);
-				 }
+			}
 				break;
-				case NING: printf("%s\n","MAL");
+			case NING: printf("%s\n","MAL");
 		
 			}
 		
 		}
 	}
 
-	else if(arg.protocol==UBX){
-		//aca iria lo de ubx
-		printf("%s\n","UBX");
-
+	else if(arg.protocol == UBX){
+		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo)) != S_EREAD){
+			if(proc_ubx != S_OK){
+				fprintf(flog, "%s\n", "error procesando una linea");
+			}
+			printf("datos de fecha universal: %d/%d/%d\nhora: %d-%d-%f\n", fecha.dia, fecha.mes, fecha.anio, fecha.hora, fecha.minutos, fecha.segundos);
+		}
 	}
 
-	printf("name: %s\n", arg.name);
-	printf("protocol: %d\n", arg.protocol);
-	printf("maxlen: %ld\n", arg.maxlen);
-	
+
+
+	if(imprimir_lista(lista, fout) != ST_OK){
+		fprintf(flog, "%s\n", "error imprimiendo lista");
+		return EXIT_SUCCESS;
+	}
+
+	if(destruir_lista(&lista) != ST_OK){
+		fprintf(flog, "%s\n", "error destruyendo lista");
+		return EXIT_SUCCESS;
+	}
+
+	if(strcmp(arg.infile_n, DEFAULT_INFILE)){
+		fclose(fin);
+	}
+
+	if(strcmp(arg.outfile_n, DEFAULT_OUTFILE)){
+		fclose(fout);
+	}
+
+	if(strcmp(arg.logfile_n, DEFAULT_LOGFILE)){
+		fclose(flog);
+	}
+
 	return EXIT_SUCCESS;
 }

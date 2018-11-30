@@ -1,11 +1,13 @@
 #ifndef LISTA_H
 #define LISTA_H
 
+#ifndef STRUCTDATA_H
 #include "structData.h"
+#endif
 #include "print.h"
 
 #define DEF_ELE 0
-#endif
+
 
 typedef struct nodo{
 	struct trkpt *mensaje;
@@ -22,3 +24,5 @@ status_t crear_lista(lista_t *l);
 status_t imprimir_lista(lista_t l, FILE *pf);
 status_t destruir_lista(lista_t *l);
 void destruir_nodo(lista_t *l);
+
+#endif

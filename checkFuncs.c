@@ -98,4 +98,3 @@ bool checkNum(char *s){
 	return true;
 }
 
-
