@@ -9,7 +9,7 @@
 #define CHECK_ZDA "$GPZDA,"
 
 #define CANT_CSUM 2
-#define ASTERISCO "*"
+#define ASTERISCO_C '*'
 #define MAX_LAT 90.0
 #define MAX_LON 180.0
 #define MAX_CAL 8

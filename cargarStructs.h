@@ -7,6 +7,7 @@
 #define END_STR '\0'
 #define AUX_PARA_HOR_MIN_SEG 10000
 #define AUX_PARA_MIN_SEG 100
+#define ASTERISCO "*"
 
 //para el GGA
 #define DELIM ","

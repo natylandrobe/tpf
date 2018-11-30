@@ -12,8 +12,8 @@ sent_t checkLine(char *s){
 	}
 
 	/* Asumimos que todas las lineas traen '*' */
-	checkSum[0] = *(strrchr(s, ASTERISCO) + 1);
-	checkSum[1] = *(strrchr(s, ASTERISCO) + 2);
+	checkSum[0] = *(strrchr(s, ASTERISCO_C) + 1);
+	checkSum[1] = *(strrchr(s, ASTERISCO_C) + 2);
 
 	if(strstr(s, CHECK_GGA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
 	
@@ -36,7 +36,7 @@ unsigned char nmea_checksum(const char * s){
 	unsigned char sum = 0;
 	int i;
 
-	for(i = 1; s[i] != ASTERISCO; i++){
+	for(i = 1; s[i] != ASTERISCO_C; i++){
 		
 		sum ^= s[i];
 	}
