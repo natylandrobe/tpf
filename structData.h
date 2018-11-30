@@ -74,31 +74,27 @@ struct s_PVT{
 	unsigned int iTOW;
 	struct fecha f;
 	unsigned char valid;
-	unsigned char fix;
 	unsigned char flags;
 	unsigned char numSV;
-	int lon;
-	int lat;
-	int hmsl;
-	int pDOP;
+	double lon;
+	double lat;
+	double hmsl;
+	unsigned short int pDOP;
 };
 
 struct s_POSLLH{
-	unsigned int iTOW;
 	struct fecha f;
-	int lon;
-	int lat;
-	int hmsl;
-	int hAcc;
-	int vAcc;
+	double lon;
+	double lat;
+	double hmsl;
+	unsigned long int hAcc;
+	unsigned long int vAcc;
 };
 
 struct s_TIM_TOS{
 	unsigned char version;
 	unsigned char gnss;
 	struct fecha f;
-	unsigned int week;
-	unsigned int tow;
 };
 
 struct trkpt{
