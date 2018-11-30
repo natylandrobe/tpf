@@ -43,7 +43,6 @@ struct fecha {
 
 
 struct s_GGA{
-	sent_t tipo;
 	struct fecha f;
 	double lat;
 	double lon;
@@ -56,7 +55,6 @@ struct s_GGA{
 
 
 struct s_RMC{
-	sent_t tipo;
 	struct fecha f;
 	char status;
 	double lat;
@@ -64,14 +62,12 @@ struct s_RMC{
 };
 
 struct s_ZDA{
-	sent_t tipo;
 	struct fecha f;
 	int time_zone;
 	int dif_tmzone;
 };
 
 struct s_PVT{
-	unsigned int iTOW;
 	struct fecha f;
 	unsigned char valid;
 	unsigned char flags;
@@ -87,8 +83,8 @@ struct s_POSLLH{
 	double lon;
 	double lat;
 	double hmsl;
-	unsigned long int hAcc;
-	unsigned long int vAcc;
+	unsigned int hAcc;
+	unsigned int vAcc;
 };
 
 struct s_TIM_TOS{

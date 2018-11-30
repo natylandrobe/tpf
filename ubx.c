@@ -1,4 +1,4 @@
-#include "structData.h"
+#include "lista.h"
 
 #define LARGO_CK_SZ 2
 #define SB_1 0xB5
@@ -52,46 +52,70 @@
 //defines cargar_pos
 #define SHIFT_2B 16
 #define SHIFT_3B 24
-#define PVTLON_B0 31
-#define PVTLON_B1 30 
-#define PVTLON_B2 29
-#define PVTLON_B3 28
-#define PVTLAT_B0 35
-#define PVTLAT_B1 34 
-#define PVTLAT_B2 33
-#define PVTLAT_B3 32
-#define PVTH_B0 43
-#define PVTH_B1 42 
-#define PVTH_B2 41
-#define PVTH_B3 40
-#define POSLON_B0 11
-#define POSLON_B1 10 
-#define POSLON_B2 9
-#define POSLON_B3 8
-#define POSLAT_B0 15
-#define POSLAT_B1 14 
-#define POSLAT_B2 13
-#define POSLAT_B3 12
-#define POSH_B0 23
-#define POSH_B1 22 
-#define POSH_B2 21
-#define POSH_B3 20
-#define SCALING 0.0000001
+#define PVTLON_B0 28
+#define PVTLON_B1 29 
+#define PVTLON_B2 30
+#define PVTLON_B3 31
+#define PVTLAT_B0 32
+#define PVTLAT_B1 33 
+#define PVTLAT_B2 34
+#define PVTLAT_B3 35
+#define PVTH_B0 40
+#define PVTH_B1 41 
+#define PVTH_B2 42
+#define PVTH_B3 43
+#define POSLON_B0 8
+#define POSLON_B1 9 
+#define POSLON_B2 10
+#define POSLON_B3 11
+#define POSLAT_B0 12
+#define POSLAT_B1 13 
+#define POSLAT_B2 14
+#define POSLAT_B3 15
+#define POSH_B0 20
+#define POSH_B1 21 
+#define POSH_B2 22
+#define POSH_B3 23
+#define SCALING_POS 0.0000001
+#define SCALING_PDOP 0.01
+
+//defines cargar_precision
+#define HACC_B0 27
+#define HACC_B1 26
+#define HACC_B2 25
+#define HACC_B3 24
+#define VACC_B0 31
+#define VACC_B1 30
+#define VACC_B2 29 
+#define VACC_B3 28
+
+//defines cargar timtos
+#define VERSION_IND 4
+#define GNSS_IND 5
 
 
 
 
 typedef enum{S_EPTNULL, S_ENOMEM, S_EREAD, S_CLASS_INV, S_ID_INV, S_CK_INV, S_LARGO_INV, S_OK, S_FIX_INV} ubxst_t;
 unsigned int calc_largo(unsigned char info[]);
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha);
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, status_t (*add_nodo)(void *, lista_t *, sent_t));
 ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin);
 ubxst_t calc_fecha(unsigned char *buff, struct fecha *fecha, unsigned char id);
 ubxst_t cargar_fecha(void *dato, struct fecha *funi, unsigned char id, unsigned char *buff, ubxst_t (*proc_fecha)(unsigned char *, struct fecha *, unsigned char));
+ubxst_t cargar_precision(struct s_POSLLH *dato, unsigned char *buff);
+ubxst_t cargar_pos(void *dato, unsigned char id, unsigned char *buff);
+ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff);
+ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, unsigned char *buff);
+ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, unsigned char *buff);
 
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha){
+
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, status_t (*add_nodo)(void *, lista_t *, sent_t)){
 	unsigned char info_largo[LARGO_CK_SZ], *buff;
 	unsigned int c, id, largo;
-	ubxst_t cks;
+	ubxst_t cks, cargar_s;
+	struct s_PVT *pvt_s;
+	struct s_POSLLH * posllh_s;
+	struct s_TIM_TOS * tt_s;
 
 	if(!fin){
 		return S_EPTNULL;
@@ -148,60 +172,105 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha){
 
 	switch(id){
 		case PVT_ID:
-			buff = (char *)malloc(sizeof(char)*PVT_BUFFSZ);
+			buff = (unsigned char *)malloc(sizeof(unsigned char)*PVT_BUFFSZ);
 			if(!buff){
 				return S_ENOMEM;
 			}
 
-			if(fread(buff, sizeof(char), PVT_BUFFSZ, fin) != PVT_BUFFSZ){
+			if(fread(buff, sizeof(unsigned char), PVT_BUFFSZ, fin) != PVT_BUFFSZ){
+				free(buff);
 				return S_EREAD;
 			}
 
 			if((cks = ubx_cksum(buff, PVT_BUFFSZ, fin)) == S_OK){
-				break;
+				pvt_s = (struct s_PVT *)malloc(sizeof(struct s_PVT));
+				if(!pvt_s){
+					free(buff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
+					break;
+				}
+
+				else{
+					free(buff);
+					free(pvt_s);
+					return cargar_s;
+				}
 			}
 
 			else{
+				free(buff);
 				return cks;
 			}
 		case TIM_TOS_ID:
-			buff = (char *)malloc(sizeof(char)*TIM_TOS_BUFFSZ);
+			buff = (unsigned char *)malloc(sizeof(unsigned char)*TIM_TOS_BUFFSZ);
 			if(!buff){
 				return S_ENOMEM;
 			}
 
-			if(fread(buff, sizeof(char), TIM_TOS_BUFFSZ, fin) != TIM_TOS_BUFFSZ){
+			if(fread(buff, sizeof(unsigned char), TIM_TOS_BUFFSZ, fin) != TIM_TOS_BUFFSZ){
+				free(buff);
 				return S_EREAD;
 			}
 
 			if((cks = ubx_cksum(buff, TIM_TOS_BUFFSZ, fin)) == S_OK){
-				break;
+				tt_s = (struct s_TIM_TOS *)malloc(sizeof(struct s_TIM_TOS));
+				if(!tt_s){
+					free(buff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sTIMTOS(tt_s, fecha, buff)) == S_OK){
+					break;
+				}
+
+				else{
+					free(buff);
+					free(tt_s);
+					return cargar_s;
+				}
 			}
 
 			else{
+				free(buff);
 				return cks;
 			}
 		case POSLLH_ID:
-			buff = (char *)malloc(sizeof(char)*POSLLH_BUFFSZ);
+			buff = (unsigned char *)malloc(sizeof(unsigned char)*POSLLH_BUFFSZ);
 			if(!buff){
 				return S_ENOMEM;
 			}
 
-			if(fread(buff, sizeof(char), POSLLH_BUFFSZ, fin) != POSLLH_BUFFSZ){
+			if(fread(buff, sizeof(unsigned char), POSLLH_BUFFSZ, fin) != POSLLH_BUFFSZ){
+				free(buff);
 				return S_EREAD;
 			}
 
 			if((cks = ubx_cksum(buff, POSLLH_BUFFSZ, fin)) == S_OK){
-				break;
+				posllh_s = (struct s_POSLLH *)malloc(sizeof(struct s_POSLLH));
+				if(!posllh_s){
+					free(buff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sPOSLLH(posllh_s, fecha, buff)) == S_OK){
+					break;
+				}
+
+				else{
+					free(buff);
+					free(posllh_s);
+					return cargar_s;
+				}
 			}
 
 			else{
+				free(buff);
 				return cks;
 			}
 	}//cierra switch
 
 
-		return S_OK;
+	return S_OK;
 
 }
 
@@ -211,25 +280,72 @@ ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff
 		return S_EPTNULL;
 	}
 
-	if(cargar_fecha(dato, funi, PVT_ID, buff, &calc_fecha) != S_OK){
-		return S_EPTNULL;
-	}
-
-	dato->valid = buff[VALID_IND];
-
 	if(!(buff[FLAG_IND]&MASK_FIX)){
 		return S_FIX_INV;
 	}
 
-	dato->flags = buff[FLAG_IND];
-	dato->numSV = buff[NUM_IND];
+	if(cargar_fecha(dato, funi, PVT_ID, buff, &calc_fecha) != S_OK){
+		return S_EPTNULL;
+	}
 
 	if(cargar_pos(dato, PVT_ID, buff) != S_OK){
 		return S_EPTNULL;
 	}
 
-	dato->pDOP = (buff[PDOP_MSB] << SHIFT_1B)|buff[PDOP_LSB];
+	dato->valid = buff[VALID_IND];
+	dato->flags = buff[FLAG_IND];
+	dato->numSV = buff[NUM_IND];
+	dato->pDOP = ((buff[PDOP_MSB] << SHIFT_1B)|buff[PDOP_LSB])*SCALING_PDOP;
 
+	return S_OK;
+}
+
+ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, unsigned char *buff){
+
+	if(!dato || !funi || !buff){
+		return S_EPTNULL;
+	}
+
+	if(cargar_fecha(dato, funi, POSLLH_ID, buff, &calc_fecha) != S_OK){
+		return S_EPTNULL;
+	}
+
+	if(cargar_pos(dato, POSLLH_ID, buff) != S_OK){
+		return S_EPTNULL;
+	}
+
+	if(cargar_precision(dato, buff) != S_OK){
+		return S_EPTNULL;
+	}
+
+	return S_OK;
+}
+
+ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, unsigned char *buff){
+
+	if(!dato || !funi || !buff){
+		return S_EPTNULL;
+	}
+
+	if(cargar_fecha(dato, funi, TIM_TOS_ID, buff, &calc_fecha) != S_OK){
+		return S_EPTNULL;
+	}
+
+	dato->version = buff[VERSION_IND];
+	dato->gnss = buff[GNSS_IND];
+
+	return S_OK;
+}
+
+ubxst_t cargar_precision(struct s_POSLLH *dato, unsigned char *buff){
+
+	if(!dato || !buff){
+		return S_EPTNULL;
+	}
+
+	dato->hAcc = (buff[HACC_B3]<< SHIFT_3B)|(buff[HACC_B2]<< SHIFT_2B)|(buff[HACC_B1]<< SHIFT_1B)| buff[HACC_B0];
+	dato->vAcc = (buff[VACC_B3]<< SHIFT_3B)|(buff[VACC_B2]<< SHIFT_2B)|(buff[VACC_B1]<< SHIFT_1B)| buff[VACC_B0];
+	
 	return S_OK;
 }
 
@@ -245,17 +361,17 @@ ubxst_t cargar_pos(void *dato, unsigned char id, unsigned char *buff){
 		case PVT_ID:
 			pvt_s = (struct s_PVT *)dato;
 
-			pvt_s->lon = ((buff[PVTLON_B3]<< SHIFT_3B)|(buff[PVTLON_B2]<< SHIFT_2B)|(buff[PVTLON_B1]<< SHIFT_1B)| buff[PVTLON_B0])*SCALING;
-			pvt_s->lat = ((buff[PVTLAT_B3]<< SHIFT_3B)|(buff[PVTLAT_B2]<< SHIFT_2B)|(buff[PVTLAT_B1]<< SHIFT_1B)|buff[PVTLAT_B0])*SCALING;
-			pvt_s->hmsl = ((buff[PVTH_B3]<< SHIFT_3B)|(buff[PVTH_B2]<< SHIFT_2B)|(buff[PVTH_B1]<< SHIFT_1B)|buff[PVTH_B0])*SCALING;
+			pvt_s->lon = ((buff[PVTLON_B3]<< SHIFT_3B)|(buff[PVTLON_B2]<< SHIFT_2B)|(buff[PVTLON_B1]<< SHIFT_1B)| buff[PVTLON_B0])*SCALING_POS;
+			pvt_s->lat = ((buff[PVTLAT_B3]<< SHIFT_3B)|(buff[PVTLAT_B2]<< SHIFT_2B)|(buff[PVTLAT_B1]<< SHIFT_1B)|buff[PVTLAT_B0])*SCALING_POS;
+			pvt_s->hmsl = ((buff[PVTH_B3]<< SHIFT_3B)|(buff[PVTH_B2]<< SHIFT_2B)|(buff[PVTH_B1]<< SHIFT_1B)|buff[PVTH_B0])*SCALING_POS;
 
 			break;
 		case POSLLH_ID:
 			posllh_s = (struct s_POSLLH *)dato;
 
-			posllh_s->lon = ((buff[POSLON_B3]<< SHIFT_3B)|(buff[POSLON_B2]<< SHIFT_2B)|(buff[POSLON_B1]<< SHIFT_1B)|buff[POSLON_B0])*SCALING;
-			posllh_s->lat = ((buff[POSLAT_B3]<< SHIFT_3B)|(buff[POSLAT_B2]<< SHIFT_2B)|(buff[POSLAT_B1]<< SHIFT_1B)|buff[POSLAT_B0])*SCALING;
-			posllh_s->hmsl = ((buff[POSH_B3]<< SHIFT_3B)|(buff[POSH_B2]<< SHIFT_2B)|(buff[POSH_B1]<< SHIFT_1B)|buff[POSH_B0])*SCALING;
+			posllh_s->lon = ((buff[POSLON_B3]<< SHIFT_3B)|(buff[POSLON_B2]<< SHIFT_2B)|(buff[POSLON_B1]<< SHIFT_1B)|buff[POSLON_B0])*SCALING_POS;
+			posllh_s->lat = ((buff[POSLAT_B3]<< SHIFT_3B)|(buff[POSLAT_B2]<< SHIFT_2B)|(buff[POSLAT_B1]<< SHIFT_1B)|buff[POSLAT_B0])*SCALING_POS;
+			posllh_s->hmsl = ((buff[POSH_B3]<< SHIFT_3B)|(buff[POSH_B2]<< SHIFT_2B)|(buff[POSH_B1]<< SHIFT_1B)|buff[POSH_B0])*SCALING_POS;
 
 			break;
 	}
