@@ -9,8 +9,6 @@
 #define MSJ_ERR_OPENI "no se pudo abrir infile"
 #define MSJ_ERR_OPENO "no se pudo abrir outfile"
 #define MSJ_ERR_ENOMEM "no hay memoria en takeargs"
-#define ASTERISCO '*'
-#define DELIM_AUX_ZDA
 
 int main (int argc, char *argv[]){
 FILE *fin, *fout, *flog;
