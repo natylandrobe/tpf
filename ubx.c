@@ -201,7 +201,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha){
 	}//cierra switch
 
 
-		
+		return S_OK;
 
 }
 
