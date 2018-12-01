@@ -1,5 +1,4 @@
-#include "structData.h"
-#include "xml.h"
+#include "print.h"
 
 /* Imprime la metadata en XML*/
 bool printMetadata(char *name, struct fecha *fecha, FILE *fout){
