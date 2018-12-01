@@ -66,6 +66,9 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 			switch (t){
 			case GGA : if ( cargar_struct_gga(linea,&Gga,&fecha)){
 			//para probar
+			if (agregar_nodo(&Gga, &lista,t)==ST_OK)
+				printf("%s\n","biengga");
+
 			printf("%s\n","BIENGGA");
 			printf("%.3f\n",Gga.lat);
 			printf("%.3f\n",Gga.lon);
@@ -80,6 +83,9 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 			case RMC :
 			if (cargar_struct_rmc(linea,&Rmc,&fecha)){
 		//para probar
+			if (agregar_nodo(&Rmc, &lista,t)==ST_OK)
+			printf("%s\n","bienrmc");
+
 			printf("%s\n","BIENRM");
 			printf("%.3f\n",Rmc.lat);
 			printf("%.3f\n",Rmc.lon);
@@ -92,6 +98,9 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 			case ZDA :
 			if(cargar_struct_zda(linea,&Zda,&fecha)){
 			//para probar
+			Gga.f=Zda.f;
+			if (agregar_nodo(&Gga, &lista,t)==ST_OK)
+				printf("%s\n","bienzda");
 			printf("%s\n","BIENZD");
 			printf("%i\n",fecha.dia);
 			printf("%i\n",fecha.mes);
