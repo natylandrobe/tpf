@@ -1,13 +1,4 @@
-#include "defArgs.h"
-
-#define MIN_DIG 0
-#define MAX_DIG 9
-#define CANT_ARGS 7
-#define ARGC_IND 2
-
-const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
-status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index);
-
+#include "args.h"
 
 /* Lee los argumentos recibidos, verifica que sean correctos y decide que accion tomar segun el argumento */
 
@@ -134,6 +125,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 
 status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 
+	const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
 	size_t i;
 	char *argumento;
 
@@ -182,4 +174,17 @@ status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 	return ST_INV;
 }
 
+status_t liberar_args(struct args *arg){
+
+	if(!arg){
+		return ST_EPTNULL;
+	}
+
+	free(arg->name);
+	free(arg->infile_n);
+	free(arg->outfile_n);
+	free(arg->logfile_n);
+
+	return ST_OK;
+}
 

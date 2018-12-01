@@ -1,5 +1,5 @@
-#ifndef DEFARGS_H
-#define DEFARGS_H
+#ifndef ARGS_H
+#define ARGS_H
 
 #include <ctype.h>
 #include "check.h"
@@ -24,8 +24,16 @@
 #define PROT_NMEA "nmea"
 #define PROT_UBX "ubx"
 
-//bool cargarFecha(char *s, struct fecha *date); mepa que no se usa
+#define MIN_DIG 0
+#define MAX_DIG 9
+#define CANT_ARGS 7
+#define ARGC_IND 2
+
+
+status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index);
 status_t defaultFecha(struct fecha *def);
+status_t liberar_args(struct args *arg);
+status_t takeArgs(int argc, char *argv[], struct args *arg);
 
 
 #endif

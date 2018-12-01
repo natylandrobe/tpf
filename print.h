@@ -27,7 +27,7 @@
 #define META "<metadata>"
 #define META_C "</metadata>"
 #define NAME "<name>"
-#define NAME_C "</name>"
+#define NAME_CT "</name>"
 #define TIME "<time>"
 #define TIME_C "</time>"
 #define YEAR_DIFF 1900

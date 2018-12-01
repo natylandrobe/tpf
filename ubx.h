@@ -1,10 +1,7 @@
 #ifndef UBX_H
 #define UBX_H
 
-#ifndef LISTA_H
 #include "lista.h"
-#endif
-
 
 #define LARGO_CK_SZ 2
 #define SB_1 0xB5

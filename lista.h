@@ -1,9 +1,8 @@
 #ifndef LISTA_H
 #define LISTA_H
 
-#ifndef STRUCTDATA_H
+
 #include "structData.h"
-#endif
 #include "print.h"
 
 #define DEF_ELE 0

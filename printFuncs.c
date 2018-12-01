@@ -13,7 +13,7 @@ bool printMetadata(char *name, struct fecha *fecha, FILE *fout){
 	fprintf(fout, "%s\n", GPX);
 	fprintf(fout, "%s%s\n%s%s%s%s\n%s%s%d-%d-%d%s%d:%d:%.0f%s%s\n%s%s\n%s%s\n%s%s\n",
 		SPC,META,
-		SPC2,NAME,name,NAME_C,
+		SPC2,NAME,name,NAME_CT,
 		SPC2,TIME,
 		fecha->anio,
 		fecha->mes,

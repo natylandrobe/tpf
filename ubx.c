@@ -18,13 +18,14 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	while((c = fgetc(fin)) != EOF){
 		if(c == SB_1){
 			if((c = fgetc(fin)) == SB_2){
+				printf("posta hace sync\n");
 				break;
 			}
 		}
 	}
-	printf("hace el sync\n");
+
 	if((c = fgetc(fin)) == EOF){
-		printf("error leyendo el char");
+		printf("error leyendo el char\n");
 		return S_EREAD;
 	}
 	printf("toma el char: %d\n", c);

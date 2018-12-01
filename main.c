@@ -190,12 +190,7 @@ FILE *fin, *fout, *flog;
 		fprintf(flog, "%s\n", "error destruyendo lista");
 		return EXIT_SUCCESS;
 	}
-
-//hacer una funcion para liberar args
-	free(arg.name);
-	free(arg.infile_n);
-	free(arg.outfile_n);
-	free(arg.logfile_n);
+	
 
 	if(strcmp(arg.infile_n, DEFAULT_INFILE)){
 		fclose(fin);
@@ -207,6 +202,12 @@ FILE *fin, *fout, *flog;
 
 	if(strcmp(arg.logfile_n, DEFAULT_LOGFILE)){
 		fclose(flog);
+	}
+
+
+	if(liberar_args(&arg) != ST_OK){
+		fprintf(flog, "%s\n", "Error ptr nulo");
+		return EXIT_SUCCESS;
 	}
 
 	return EXIT_SUCCESS;
