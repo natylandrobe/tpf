@@ -134,6 +134,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sTIMTOS(tt_s, fecha, buff)) == S_OK){
+					free(buff);
+					free(tt_s);
 					break;
 				}
 
