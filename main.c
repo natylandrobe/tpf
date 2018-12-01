@@ -3,6 +3,7 @@
 #include "funcmain.h"
 #include "ubx.h"
 #include "cargarStructs.h"
+#include "files.h"
 
 #define MSJ_ERR_1 "puntero nulo en defaultArgs"
 #define MSJ_ERR_2 "no mem en defaultArgs"
@@ -13,7 +14,7 @@
 #define MSJ_ERR_ENOMEM "no hay memoria en takeargs"
 
 int main (int argc, char *argv[]){
-FILE *fin, *fout, *flog;
+FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	struct s_RMC Rmc;
 	struct s_GGA Gga;
 	struct s_ZDA Zda;
@@ -21,7 +22,7 @@ FILE *fin, *fout, *flog;
 	char linea[MAX_LINE];
 	struct args arg;
 	//struct data track;	
-	status_t st;
+	status_t st, file_st;
 	sent_t t;
 	size_t i = 0;
 	lista_t lista;
@@ -65,36 +66,8 @@ FILE *fin, *fout, *flog;
 		return EXIT_SUCCESS;
 	}
 
-	if(!strcmp(arg.logfile_n, DEFAULT_LOGFILE)){
-		flog = stderr;
-	}
-
-	else{
-		if((flog = fopen(arg.logfile_n, "w")) == NULL){
-		fprintf(stderr, "%s\n", MSJ_ERR_OPENL);//cambiar mensaje
+	if((file_st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
 		return EXIT_SUCCESS;
-		}
-	}
-
-	if(!strcmp(arg.infile_n, DEFAULT_INFILE)){
-		fin = stdin;
-	}
-
-	else{
-		if((fin = fopen(arg.infile_n, "rb")) == NULL){
-		fprintf(flog, "%s\n", MSJ_ERR_OPENI);//cambiar mensaje
-		return EXIT_SUCCESS;
-		}
-	}
-	if(!strcmp(arg.outfile_n, DEFAULT_OUTFILE)){
-		fout = stdout;
-	}
-
-	else{
-		if((fout = fopen(arg.outfile_n, "w")) == NULL){
-			fprintf(flog, "%s\n", MSJ_ERR_OPENO);//cambiar mensaje
-			return EXIT_SUCCESS;
-		}
 	}
 
 	printf("name: %s\n", arg.name);
@@ -111,7 +84,7 @@ FILE *fin, *fout, *flog;
 		return EXIT_SUCCESS;
 	}
 
-	if (arg.protocol==NMEA){
+	if(arg.protocol == NMEA){
 	// este while es para hacer pruebas, no es parte del programa
 		while(fgets(linea, MAX_LINE, fin)){
 
@@ -192,16 +165,9 @@ FILE *fin, *fout, *flog;
 	}
 	
 
-	if(strcmp(arg.infile_n, DEFAULT_INFILE)){
-		fclose(fin);
-	}
-
-	if(strcmp(arg.outfile_n, DEFAULT_OUTFILE)){
-		fclose(fout);
-	}
-
-	if(strcmp(arg.logfile_n, DEFAULT_LOGFILE)){
-		fclose(flog);
+	if(cerrar_archivos(&fin, &fout, &flog, &arg) != ST_OK){
+		fprintf(stderr, "%s\n", "error cerrando archivos");
+		return EXIT_SUCCESS;
 	}
 
 
