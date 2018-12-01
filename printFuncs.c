@@ -2,34 +2,29 @@
 #include "xml.h"
 
 /* Imprime la metadata en XML*/
-bool printMetadata(char *name){
+bool printMetadata(char *name, struct fecha *fecha, FILE *fout){
 
-	time_t rawtime;
-   	struct tm *timeinfo;
-
-   	if(!name){
+   	if(!name || !fecha || !fout){
 
    		return false;
    	}
 
-   	time(&rawtime);
-   	timeinfo = localtime(&rawtime);
-
-   	printf("%s\n", XML);
-	printf("%s\n", GPX);
-	printf("%s%s\n%s%s%s%s\n%s%s%d-%d-%d%s%d:%d:%s%s%d\n%s%s\n%s%s\n%s%s\n",
+   	
+   	fprintf(fout, "%s\n", XML);
+	fprintf(fout, "%s\n", GPX);
+	fprintf(fout, "%s%s\n%s%s%s%s\n%s%s%d-%d-%d%s%d:%d:%.0f%s%s\n%s%s\n%s%s\n%s%s\n",
 		SPC,META,
 		SPC2,NAME,name,NAME_C,
 		SPC2,TIME,
-		timeinfo->tm_year + YEAR_DIFF,
-		timeinfo->tm_mon + MON_DIFF,
-		timeinfo->tm_mday,
+		fecha->anio,
+		fecha->mes,
+		fecha->dia,
 		T,
-		timeinfo->tm_hour,
-		timeinfo->tm_min,
+		fecha->hora,
+		fecha->minutos,
+		fecha->segundos,
 		Z,
 		TIME_C,
-		timeinfo->tm_sec,
 		SPC,META_C,
 		SPC,TRK,
 		SPC2,TRKSEG);
@@ -38,18 +33,27 @@ bool printMetadata(char *name){
 }
 
 /* Imprime cierres de los tags Trackseg, Track y gpx */
-void printTrkC(void){
+bool printTrkC(FILE *fout){
 
-	printf("%s%s\n%s%s\n%s\n",
+	if(!fout){
+		return false;
+	}
+
+	fprintf(fout, "%s%s\n%s%s\n%s\n",
 			SPC2,TRKSEG_C,
 			SPC, TRK_C,
 			GPX_C);
+	return true;
 }
 
 /* Imprime la estructura en formato XML */
-void printStruct(struct trkpt *track){
+bool printStruct(struct trkpt *track, FILE *fout){
 
-	printf("%s%s%f%s%f%s\n%s%s%s%f%s\n%s%s%s%d-%d-%d%s%d:%d:%.3f%s%s\n%s%s\n",
+	if(!track || !fout){
+		return false;
+	}
+
+	fprintf(fout, "%s%s%f%s%f%s\n%s%s%s%f%s\n%s%s%s%d-%d-%d%s%d:%d:%.3f%s%s\n%s%s\n",
 		SPC3, TRKPT_START,
 		track->lat,
 		TRKPT_MID,
@@ -62,6 +66,8 @@ void printStruct(struct trkpt *track){
 		T,track->f.hora,track->f.minutos,track->f.segundos,
 		Z, TIME_C,
 		SPC3, TRKPT_C);
+
+	return true;
 }
 
 /* Imprime mensaje de ayuda */

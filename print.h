@@ -6,9 +6,9 @@
 #endif
 
 
-bool printMetadata(char *name);
-void printTrkC(void);
-void printStruct(struct trkpt *track);
+bool printMetadata(char *name, struct fecha *fecha, FILE *fout);
+bool printTrkC(FILE *fout);
+bool printStruct(struct trkpt *track, FILE *fout);
 void printHelp(void);
 
 #endif

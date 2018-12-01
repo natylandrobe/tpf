@@ -101,6 +101,11 @@ FILE *fin, *fout, *flog;
 	printf("protocol: %d\n", arg.protocol);
 	printf("maxlen: %ld\n", arg.maxlen);
 
+	if(!(printMetadata(arg.name, &fecha, fout))){
+		fprintf(flog, "%s\n", "Error ptr nulo");
+		return EXIT_SUCCESS;
+	}
+
 	if(crear_lista(&lista) != ST_OK){
 		fprintf(flog, "%s", "no se pudo crear la lista");
 		return EXIT_SUCCESS;
@@ -176,10 +181,21 @@ FILE *fin, *fout, *flog;
 		return EXIT_SUCCESS;
 	}
 
+	if(!(printTrkC(fout))){
+		fprintf(flog, "%s\n", "Error ptr nulo");
+		return EXIT_SUCCESS;
+	}
+
 	if(destruir_lista(&lista) != ST_OK){
 		fprintf(flog, "%s\n", "error destruyendo lista");
 		return EXIT_SUCCESS;
 	}
+
+//hacer una funcion para liberar args
+	free(arg.name);
+	free(arg.infile_n);
+	free(arg.outfile_n);
+	free(arg.logfile_n);
 
 	if(strcmp(arg.infile_n, DEFAULT_INFILE)){
 		fclose(fin);

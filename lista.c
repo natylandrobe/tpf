@@ -27,12 +27,12 @@ void destruir_nodo(lista_t *l){
 	*l = NULL;
 }
 
-status_t imprimir_lista(lista_t l, FILE *pf){
-	if(!pf || !l){
+status_t imprimir_lista(lista_t l, FILE *fout){
+	if(!fout || !l){
 		return ST_EPTNULL;
 	}
 	while(l){
-		printStruct(l->mensaje);
+		printStruct(l->mensaje, fout);
 		l = l->sig;
 	}
 	return ST_OK;
