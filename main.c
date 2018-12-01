@@ -70,10 +70,6 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 		return EXIT_SUCCESS;
 	}
 
-	printf("name: %s\n", arg.name);
-	printf("protocol: %d\n", arg.protocol);
-	printf("maxlen: %ld\n", arg.maxlen);
-
 	if(!(printMetadata(arg.name, &fecha, fout))){
 		fprintf(flog, "%s\n", "Error ptr nulo");
 		return EXIT_SUCCESS;
@@ -143,7 +139,6 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 			if(proc_ubx != S_OK){
 				fprintf(flog, "%s\n", "error procesando una linea");
 			}
-			printf("datos de fecha universal: %d/%d/%d\nhora: %d-%d-%f\n", fecha.dia, fecha.mes, fecha.anio, fecha.hora, fecha.minutos, fecha.segundos);
 		}
 	}
 

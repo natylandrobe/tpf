@@ -10,7 +10,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	struct s_POSLLH * posllh_s;
 	struct s_TIM_TOS * tt_s;
 	status_t carga_nodo;
-	printf("entra a proc ubx\n");
+
 	if(!fin){
 		return S_EPTNULL;
 	}
@@ -18,17 +18,17 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	while((c = fgetc(fin)) != EOF){
 		if(c == SB_1){
 			if((c = fgetc(fin)) == SB_2){
-				printf("posta hace sync\n");
+
 				break;
 			}
 		}
 	}
 
 	if((c = fgetc(fin)) == EOF){
-		printf("error leyendo el char\n");
+
 		return S_EREAD;
 	}
-	printf("toma el char: %d\n", c);
+
 	switch(c){
 		case NAV_CL:
 			if((id = fgetc(fin)) == EOF){
@@ -50,7 +50,6 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 		default:
 			return S_CLASS_INV;
 	}
-	printf("reconoce class y id\n");
 
 	if(fread(info_largo, sizeof(char), LARGO_CK_SZ, fin) != LARGO_CK_SZ){
 		return S_EREAD;
@@ -58,7 +57,6 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 
 	largo = calc_largo(info_largo);
 	
-	printf("reconoce el largo: %d\n", largo);
 
 	if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS_L) || (id == POSLLH_ID && largo != POSLLH_L)){
 		return S_LARGO_INV;
@@ -81,18 +79,16 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 			}
 
 			if((cks = ubx_cksum(buff, PVT_BUFFSZ, fin)) == S_OK){
-				printf("ok cksum pvt\n");
+
 				pvt_s = (struct s_PVT *)malloc(sizeof(struct s_PVT));
 				if(!pvt_s){
 					free(buff);
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
-					printf("carga la estructura pvt");
 				}
 
 				else{
-					printf("error");
 					free(buff);
 					free(pvt_s);
 					return cargar_s;

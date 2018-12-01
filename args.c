@@ -13,7 +13,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 	}
 
 	for (i = 1; i < argc; i++){
-		printf("arg: %ld\n", i);
+
 		/*se fija si el argumento empieza con '-' */
 		if (*argv[i] == ARG_C){
 			argumento = *(argv[i]+1);
