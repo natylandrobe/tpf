@@ -74,3 +74,96 @@ void printHelp(void){
 
 	printf("%s\n", HELP);
 }
+
+void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb){
+
+    if(!flog){
+        return ;
+    }
+
+    if(status){
+        switch(*status){
+            case ST_INV:
+                fprintf(stderr, "%s\n", MSJ_ESTINV);
+                break;
+            case ST_EPTNULL:
+                fprintf(stderr, "%s\n", MSJ_EPTNULL);
+                break;
+            case ST_ENOMEM:
+                fprintf(stderr, "%s\n", MSJ_ENOMEM);
+                break;
+            case ST_EAGR:
+                fprintf(flog, "%s\n", MSJ_EAGR);
+                break;
+            case ST_EFILEO:
+                fprintf(flog, "%s\n", MSJ_EFILEO);
+                break;
+            case ST_EFILEC:
+                fprintf(flog, "%s\n", MSJ_EFILEC);
+                break;
+            default:
+                return ;
+        }
+    }
+
+    if(ubx_st){
+        switch(*ubx_st){
+            case S_EPTNULL:
+                fprintf(stderr, "%s\n", MSJ_EPTNULL);
+                break;
+            case S_ENOMEM:
+                fprintf(stderr, "%s\n", MSJ_ENOMEM);
+                break;
+            case S_EREAD:
+                fprintf(flog, "%s\n", MSJ_EOF);
+                break;
+            case S_CLASS_INV:
+                fprintf(flog, "%s\n", MSJ_CLASSINV);
+                break;
+            case S_ID_INV:
+                fprintf(flog, "%s\n", MSJ_IDINV);
+                break;
+            case S_CK_INV:
+                fprintf(flog, "%s\n", MSJ_CKINV);
+                break;
+            case S_LARGO_INV:
+                fprintf(flog, "%s\n", MSJ_LARGONIV);
+                break;
+            case S_FIX_INV:
+                fprintf(flog, "%s\n", MSJ_FIXINV);
+                break;
+            case S_EAGR:
+                fprintf(flog, "%s\n", MSJ_EAGR);
+                break;
+            default:
+                return ;
+        }
+    }
+
+    if(deb){
+        switch(*deb){
+            case SYNC:
+                fprintf(flog, "%s\n", MSJ_SYNC);
+                break;
+            case ID_D:
+                fprintf(flog, "%s\n", MSJ_IDD);
+                break;
+            case MSJ_OK:
+                fprintf(flog, "%s\n", MSJ_MSJOK);
+                break;
+            case CARGA_MSJ:
+                fprintf(flog, "%s\n", MSJ_CARGA);
+                break;
+            case IMP_MSJ:
+                fprintf(flog, "%s\n", MSJ_IMP);
+                break;
+            case LIST_FULL:
+                fprintf(flog, "%s\n", MSJ_FULLLIST);
+                break;
+            default:
+                return ;
+        }
+
+    }
+
+}

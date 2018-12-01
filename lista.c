@@ -30,12 +30,17 @@ status_t destruir_nodo(lista_t *l){
 	return ST_OK;
 }
 
-status_t imprimir_lista(lista_t l, FILE *fout){
-	if(!fout){
+status_t imprimir_lista(lista_t l, FILE *fout, FILE *flog){
+
+	debug_t deb;
+
+	if(!fout || !flog){
 		return ST_EPTNULL;
 	}
 	while(l){
 		printStruct(l->mensaje, fout);
+		deb = IMP_MSJ;
+		imp_log(flog, NULL, NULL, &deb);
 		l = l->sig;
 	}
 	return ST_OK;

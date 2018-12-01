@@ -1,7 +1,7 @@
 #include "ubx.h"
 
 
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t)){
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog){
 	unsigned char info_largo[LARGO_CK_SZ], *buff;
 	unsigned int id, largo;
 	int c;
@@ -9,10 +9,14 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	struct s_PVT *pvt_s;
 	struct s_POSLLH * posllh_s;
 	struct s_TIM_TOS * tt_s;
+	debug_t deb;
 
-	if(!fin){
+	if(!fin || !flog || !fecha || !lista || !index || !add_nodo){
 		return S_EPTNULL;
 	}
+	
+	deb = SYNC;
+	imp_log(flog, NULL, NULL, &deb);
 
 	while((c = fgetc(fin)) != EOF){
 		if(c == SB_1){
@@ -50,6 +54,9 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 			return S_CLASS_INV;
 	}
 
+	deb = ID_D;
+	imp_log(flog, NULL, NULL, &deb);
+
 	if(fread(info_largo, sizeof(char), LARGO_CK_SZ, fin) != LARGO_CK_SZ){
 		return S_EREAD;
 	}
@@ -85,7 +92,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
-					;
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
 				}
 
 				else{
@@ -95,6 +103,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 				}
 
 				if((*add_nodo)(pvt_s, lista, NAV_PVT) == ST_OK){
+					deb = CARGA_MSJ;
+					imp_log(flog, NULL, NULL, &deb);
 					(*index)++;
 					free(pvt_s);
 					free(buff);
@@ -130,6 +140,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sTIMTOS(tt_s, fecha, buff)) == S_OK){
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
 					free(buff);
 					free(tt_s);
 					break;
@@ -164,7 +176,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sPOSLLH(posllh_s, fecha, buff)) == S_OK){
-					;
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
 				}
 
 				else{
@@ -173,6 +186,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return cargar_s;
 				}
 				if((*add_nodo)(posllh_s, lista, NAV_POSLLH) == ST_OK){
+					deb = CARGA_MSJ;
+					imp_log(flog, NULL, NULL, &deb);
 					(*index)++;
 					free(posllh_s);
 					free(buff);

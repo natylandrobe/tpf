@@ -22,6 +22,8 @@ typedef enum{HELP, NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
 extern const char dic_args[][MAX_STR];
 typedef enum{INV, UBX, NMEA} protocol_t;
 typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH, NING} sent_t;
+typedef enum{SYNC, ID_D, MSJ_OK, CARGA_MSJ, IMP_MSJ, LIST_FULL}debug_t;
+typedef enum{S_EPTNULL, S_ENOMEM, S_EREAD, S_CLASS_INV, S_ID_INV, S_CK_INV, S_LARGO_INV, S_FIX_INV, S_EAGR, S_OK} ubxst_t;
 
 struct args {
 	char *name;

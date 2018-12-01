@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "main.h"
-#include "ubx.h"
-#include "cargarStructs.h"
-#include "files.h"
+
 
 int main (int argc, char *argv[]){
 FILE *fin = NULL, *fout = NULL, *flog = NULL;
@@ -19,14 +17,15 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	size_t i = 0;
 	lista_t lista;
 	ubxst_t proc_ubx;
+	debug_t deb;
 
 	if((st = defaultFecha(&fecha)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = defaultArgs(&arg)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
@@ -37,22 +36,22 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	}
 	
 	else if(st != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = printMetadata(arg.name, &fecha, fout)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = crear_lista(&lista)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
@@ -120,44 +119,46 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	}
 
 	else if(arg.protocol == UBX){
-		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo)) != S_EREAD){
+		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog)) != S_EREAD){
 			if(proc_ubx != S_OK){
-				imp_log(flog, NULL, &proc_ubx);
-				printf("aca printeo en el log mal fix\n");
-				/*if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){
+				imp_log(flog, NULL, &proc_ubx, NULL);
+				if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){
 					return EXIT_SUCCESS;
-				}*/
+				}
 			}
+		}
+		if(proc_ubx != S_EREAD){
+			deb = LIST_FULL;
+			imp_log(flog, NULL, NULL, &deb);
 		}
 	}
 
 
 
-	if((st = imprimir_lista(lista, fout)) != ST_OK){
-		imp_log(flog, &st, NULL);
-		printf("aca tira puntero nulo\n");
+	if((st = imprimir_lista(lista, fout, flog)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = printTrkC(fout)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = destruir_lista(&lista)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 	
 
 	if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 
 	if((st = liberar_args(&arg)) != ST_OK){
-		imp_log(flog, &st, NULL);
+		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 

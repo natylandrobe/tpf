@@ -1,9 +1,7 @@
 #ifndef PRINT_H
 #define PRINT_H
 
-#ifndef STRUCTDATA_H
 #include "structData.h"
-#endif
 
 #define TRK "<trk>"
 #define TRK_C "</trk>"
@@ -35,9 +33,31 @@
 
 #define HELP "Utilice en cualquier orden los siguientes argumentos:\n-n o --name para ingresar el nombre de la ruta\n-i o --infile para ingresar el nombre del archivo de entrada (utilice - para stdin)\n-o o --outfile para ingresar el nombre del archivo de salida (utilice - para stdout)\n-l o --logfile para ingresar el nombre del archivo log (utilice - para stderr)\n-p o --protocol para indicar el protocolo a leer\n-m o --maxlen para indicar la cantidad maxima de mensajes a leer\n"
 
+//defines imp_log
+
+#define MSJ_ESTINV "[ERROR] Ingrese un argumento valido"
+#define MSJ_EPTNULL "[ERROR] Puntero Nulo"
+#define MSJ_ENOMEM "[ERROR] No se puede alocar la memoria"
+#define MSJ_EAGR "[WARNING] No se pudo agregar el nodo"
+#define MSJ_EFILEO "[ERROR] No se pudo abrir correctamente un archivo"
+#define MSJ_EFILEC "[ERROR] No se pudo cerrar correctamente un archivo"
+#define MSJ_CLASSINV "[WARNING] No se reconoce la clase"
+#define MSJ_IDINV "[WARNING] No se reconoce el ID"
+#define MSJ_CKINV "[ERROR] No concuerda el checksum"
+#define MSJ_LARGONIV "[ERROR] Mensaje contiene largo invalido"
+#define MSJ_FIXINV "[WARNING] Mensaje contiene fix invalido"
+#define MSJ_EOF "[DEBUG] Se termino de leer el archivo"
+#define MSJ_SYNC "[DEBUG] Buscando bytes de sincronismo"
+#define MSJ_IDD "[DEBUG] ID detectado"
+#define MSJ_MSJOK "[DEBUG] Mensaje recolectado"
+#define MSJ_CARGA "[DEBUG] Mensaje cargado a la lista"
+#define MSJ_IMP "[DEBUG] Mensaje impreso"
+#define MSJ_FULLLIST "[WARNING] Se descartan mensajes por lista llena"
+
 status_t printMetadata(char *name, struct fecha *fecha, FILE *fout);
 status_t printTrkC(FILE *fout);
 status_t printStruct(struct trkpt *track, FILE *fout);
 void printHelp(void);
+void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb);
 
 #endif

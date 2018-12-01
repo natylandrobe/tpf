@@ -1,9 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "print.h"
 #include "check.h"
 #include "args.h"
+#include "ubx.h"
+#include "cargarStructs.h"
+#include "files.h"
 
 #define MAX_LINE 300 
 #define MSJ_ERR_INV "Ingrese un dato valido"
