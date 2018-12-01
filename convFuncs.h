@@ -2,7 +2,7 @@
 #define DEFCONV_H
 
 #include <math.h>
-#include <string.h>
+#include "structData.h"
 
 #define DIGITO_GRADO  100.0
 #define LAT_MAX 9000.000

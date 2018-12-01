@@ -24,8 +24,7 @@
 #define PROT_NMEA "nmea"
 #define PROT_UBX "ubx"
 
-#define MIN_DIG 0
-#define MAX_DIG 9
+
 #define CANT_ARGS 7
 #define ARGC_IND 2
 

@@ -1,5 +1,4 @@
- #include "structData.h"
- #include "defConv.h"
+ #include "convFuncs.h"
 
 /* Devuelve la longitud como numero, positivo si es este, negativo si es oeste */
 double convertirLon(const char lon[], const char * cardinal){

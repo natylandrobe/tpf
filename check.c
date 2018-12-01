@@ -1,4 +1,4 @@
-#include "defCheck.h"
+#include "check.h"
 
 /*verifica que tipo de nma es*/
 
