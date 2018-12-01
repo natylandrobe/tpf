@@ -12,23 +12,26 @@ status_t destruir_lista(lista_t *l){
 
 	siguiente = (*l)->sig;
 
-	destruir_nodo(l);
+	if(destruir_nodo(l) != ST_OK){
+		return ST_EPTNULL;
+	}
 
 	return destruir_lista(&siguiente);
 }
 
-void destruir_nodo(lista_t *l){
+status_t destruir_nodo(lista_t *l){
 
 	if(!l || !(*l)){
-		return ;
+		return ST_EPTNULL;
 	}
 	free((*l)->mensaje);
 	free(*l);
 	*l = NULL;
+	return ST_OK;
 }
 
 status_t imprimir_lista(lista_t l, FILE *fout){
-	if(!fout || !l){
+	if(!fout){
 		return ST_EPTNULL;
 	}
 	while(l){

@@ -22,6 +22,6 @@ status_t agregar_nodo(void * dato, lista_t *l, sent_t tipo);
 status_t crear_lista(lista_t *l);
 status_t imprimir_lista(lista_t l, FILE *fout);
 status_t destruir_lista(lista_t *l);
-void destruir_nodo(lista_t *l);
+status_t destruir_nodo(lista_t *l);
 
 #endif

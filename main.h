@@ -1,5 +1,5 @@
-#ifndef FUNCMAIN_H
-#define FUNCMAIN_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include "print.h"
 #include "check.h"

@@ -9,7 +9,6 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	struct s_PVT *pvt_s;
 	struct s_POSLLH * posllh_s;
 	struct s_TIM_TOS * tt_s;
-	status_t carga_nodo;
 
 	if(!fin){
 		return S_EPTNULL;
@@ -86,6 +85,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return S_EPTNULL;
 				}
 				if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
+					;
 				}
 
 				else{
@@ -94,7 +94,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					return cargar_s;
 				}
 
-				if((carga_nodo = (*add_nodo)(pvt_s, lista, NAV_PVT)) == ST_OK){
+				if((*add_nodo)(pvt_s, lista, NAV_PVT) == ST_OK){
 					(*index)++;
 					free(pvt_s);
 					free(buff);
@@ -103,7 +103,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 				else{
 					free(buff);
 					free(pvt_s);
-					return carga_nodo;
+					return S_EAGR;
 				}
 
 			}
@@ -172,7 +172,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 					free(posllh_s);
 					return cargar_s;
 				}
-				if((carga_nodo = (*add_nodo)(posllh_s, lista, NAV_POSLLH)) == ST_OK){
+				if((*add_nodo)(posllh_s, lista, NAV_POSLLH) == ST_OK){
 					(*index)++;
 					free(posllh_s);
 					free(buff);
@@ -181,7 +181,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 				else{
 					free(buff);
 					free(posllh_s);
-					return carga_nodo;
+					return S_EAGR;
 				}
 			}
 
@@ -202,9 +202,9 @@ ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff
 		return S_EPTNULL;
 	}
 
-	// if(!(buff[FLAG_IND]&MASK_FIX)){
-	// 	return S_FIX_INV;
-	// }
+	if(!(buff[FLAG_IND]&MASK_FIX)){
+		return S_FIX_INV;
+	}
 
 	if(cargar_fecha(dato, funi, PVT_ID, buff, &calc_fecha) != S_OK){
 		return S_EPTNULL;

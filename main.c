@@ -1,17 +1,9 @@
 #include <stdio.h>
 #include <string.h>
-#include "funcmain.h"
+#include "main.h"
 #include "ubx.h"
 #include "cargarStructs.h"
 #include "files.h"
-
-#define MSJ_ERR_1 "puntero nulo en defaultArgs"
-#define MSJ_ERR_2 "no mem en defaultArgs"
-#define MSJ_ERR_EPTNULL "puntero nulo takeargs"
-#define MSJ_ERR_OPENL "no se pudo abrir logfile"
-#define MSJ_ERR_OPENI "no se pudo abrir infile"
-#define MSJ_ERR_OPENO "no se pudo abrir outfile"
-#define MSJ_ERR_ENOMEM "no hay memoria en takeargs"
 
 int main (int argc, char *argv[]){
 FILE *fin = NULL, *fout = NULL, *flog = NULL;
@@ -22,24 +14,19 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	char linea[MAX_LINE];
 	struct args arg;
 	//struct data track;	
-	status_t st, file_st;
+	status_t st;
 	sent_t t;
 	size_t i = 0;
 	lista_t lista;
 	ubxst_t proc_ubx;
 
-	if(defaultFecha(&fecha) != ST_OK){
-		printf("default fecha error\n");
+	if((st = defaultFecha(&fecha)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
-	if((st = defaultArgs(&arg)) == ST_EPTNULL){
-		fprintf(stderr, "%s\n", MSJ_ERR_1); //cambiar mensaje
-		return EXIT_SUCCESS;
-	}
-
-	else if(st == ST_ENOMEM){
-		fprintf(stderr, "%s\n", MSJ_ERR_2); //cambiar mensaje
+	if((st = defaultArgs(&arg)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
@@ -49,34 +36,23 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 		return EXIT_SUCCESS;
 	}
 	
-	else if(st == ST_INV){
-
-		fprintf(stderr, "%s\n", MSJ_ERR_INV);//cambiar mensaje
+	else if(st != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
-	else if(st == ST_EPTNULL){
-
-		fprintf(stderr, "%s\n", MSJ_ERR_EPTNULL);//cambiar mensaje
-		return EXIT_SUCCESS;
-	}
-	else if(st == ST_ENOMEM){
-
-		fprintf(stderr, "%s\n", MSJ_ERR_ENOMEM);//cambiar mensaje
+	if((st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
-	if((file_st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+	if((st = printMetadata(arg.name, &fecha, fout)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
-	if(!(printMetadata(arg.name, &fecha, fout))){
-		fprintf(flog, "%s\n", "Error ptr nulo");
-		return EXIT_SUCCESS;
-	}
-
-	if(crear_lista(&lista) != ST_OK){
-		fprintf(flog, "%s", "no se pudo crear la lista");
+	if((st = crear_lista(&lista)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
@@ -137,37 +113,42 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	else if(arg.protocol == UBX){
 		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo)) != S_EREAD){
 			if(proc_ubx != S_OK){
-				fprintf(flog, "%s\n", "error procesando una linea");
+				imp_log(flog, NULL, &proc_ubx);
+				printf("aca printeo en el log mal fix\n");
+				/*if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){
+					return EXIT_SUCCESS;
+				}*/
 			}
 		}
 	}
 
 
 
-	if(imprimir_lista(lista, fout) != ST_OK){
-		fprintf(flog, "%s\n", "error imprimiendo lista");
+	if((st = imprimir_lista(lista, fout)) != ST_OK){
+		imp_log(flog, &st, NULL);
+		printf("aca tira puntero nulo\n");
 		return EXIT_SUCCESS;
 	}
 
-	if(!(printTrkC(fout))){
-		fprintf(flog, "%s\n", "Error ptr nulo");
+	if((st = printTrkC(fout)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
-	if(destruir_lista(&lista) != ST_OK){
-		fprintf(flog, "%s\n", "error destruyendo lista");
+	if((st = destruir_lista(&lista)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 	
 
-	if(cerrar_archivos(&fin, &fout, &flog, &arg) != ST_OK){
-		fprintf(stderr, "%s\n", "error cerrando archivos");
+	if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 
 
-	if(liberar_args(&arg) != ST_OK){
-		fprintf(flog, "%s\n", "Error ptr nulo");
+	if((st = liberar_args(&arg)) != ST_OK){
+		imp_log(flog, &st, NULL);
 		return EXIT_SUCCESS;
 	}
 

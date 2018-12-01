@@ -35,9 +35,9 @@
 
 #define HELP "Utilice en cualquier orden los siguientes argumentos:\n-n o --name para ingresar el nombre de la ruta\n-i o --infile para ingresar el nombre del archivo de entrada (utilice - para stdin)\n-o o --outfile para ingresar el nombre del archivo de salida (utilice - para stdout)\n-l o --logfile para ingresar el nombre del archivo log (utilice - para stderr)\n-p o --protocol para indicar el protocolo a leer\n-m o --maxlen para indicar la cantidad maxima de mensajes a leer\n"
 
-bool printMetadata(char *name, struct fecha *fecha, FILE *fout);
-bool printTrkC(FILE *fout);
-bool printStruct(struct trkpt *track, FILE *fout);
+status_t printMetadata(char *name, struct fecha *fecha, FILE *fout);
+status_t printTrkC(FILE *fout);
+status_t printStruct(struct trkpt *track, FILE *fout);
 void printHelp(void);
 
 #endif
