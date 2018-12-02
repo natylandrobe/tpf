@@ -1,5 +1,6 @@
 #include "cargarStructs.h" 
 
+#define INDEX_FECHA_RMC 9
 
 /* Carga la fecha del sistema a la estructura de tipo fecha */
 bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
@@ -92,7 +93,7 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         char status;
         char *tokens[CANT_TOKEN_RMC];
         double lat, lon;
-        double horario;
+        double horario,dia,mes,anio,fecha;
        
      	if(!s){
                 return false;
@@ -121,6 +122,21 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         	status=STATUS_RMC_ACT;
         }
 
+        fecha= strtod(tokens[INDEX_FECHA_RMC], &check);
+
+        if(*check != END_STR){
+                return false;
+        }
+
+        dia=(int)fecha/AUX_1_PARA_FECHA ;
+        mes= (int)fecha%AUX_1_PARA_FECHA /AUX_2_PARA_FECHA;
+        anio=(int)fecha%AUX_2_PARA_FECHA +AUX_3_PARA_FECHA;
+
+        if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio)){
+            return false ;
+        }
+
+
         lat = convertirLat(tokens[INDEX_LAT_RMC], tokens[INDEX_LAT_CARD_RMC]);
         lon = convertirLon(tokens[INDEX_LON_RMC], tokens[INDEX_LON_CARD_RMC]);
 
@@ -131,6 +147,9 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         Rmc->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
         Rmc->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
         Rmc->f.segundos = horario-Rmc->f.hora*AUX_PARA_HOR_MIN_SEG-Rmc->f.minutos*AUX_PARA_MIN_SEG;
+        Rmc->f.dia = dia;
+        Rmc->f.mes = mes;
+        Rmc->f.anio= anio;
         *date= Rmc->f;  
         Rmc->lat = lat;
         Rmc->lon = lon;
@@ -210,7 +229,9 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
   		Gga->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
         Gga->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
         Gga->f.segundos = horario-Gga->f.hora*AUX_PARA_HOR_MIN_SEG-Gga->f.minutos*AUX_PARA_MIN_SEG;
-        *date=Gga->f;
+        date->hora=Gga->f.hora;
+        date->minutos=Gga->f.minutos;
+        date->segundos=Gga->f.segundos;
         Gga->lat = lat;
         Gga->lon = lon;
         Gga->calidad = calidad;
