@@ -1,5 +1,6 @@
 #include "lista.h"
 
+//libera la memoria de la lista
 status_t destruir_lista(lista_t *l){
 	nodo_t *siguiente;
 	
@@ -19,6 +20,7 @@ status_t destruir_lista(lista_t *l){
 	return destruir_lista(&siguiente);
 }
 
+//libera la memoria del nodo
 status_t destruir_nodo(lista_t *l){
 
 	if(!l || !(*l)){
@@ -30,6 +32,7 @@ status_t destruir_nodo(lista_t *l){
 	return ST_OK;
 }
 
+//imprime nodo por nodo la lista
 status_t imprimir_lista(lista_t l, FILE *fout, FILE *flog){
 
 	debug_t deb;
@@ -46,6 +49,7 @@ status_t imprimir_lista(lista_t l, FILE *fout, FILE *flog){
 	return ST_OK;
 }
 
+//toma un puntero a lista y le asigna NULL a la lista apuntada
 status_t crear_lista(lista_t *l){
 	if(!l){
 		return ST_EPTNULL;
@@ -54,6 +58,7 @@ status_t crear_lista(lista_t *l){
 	return ST_OK;
 }
 
+//toma un puntero a cualquiera de las estructuras de las sentencias y agrega un nodo al final de la lista
 status_t agregar_nodo(void * dato, lista_t *l, sent_t tipo){
 	nodo_t *temp, *aux;
 	if(!dato || !l){
@@ -75,6 +80,7 @@ status_t agregar_nodo(void * dato, lista_t *l, sent_t tipo){
 	return ST_OK;
 }
 
+//toma un puntero a cualquier estructura de las sentencias y crea un nodo a partir de esta
 nodo_t *crear_nodo(void *dato, struct trkpt *(*procesar)(void *, sent_t), sent_t tipo){
 	nodo_t *pn;
 	
@@ -97,6 +103,7 @@ nodo_t *crear_nodo(void *dato, struct trkpt *(*procesar)(void *, sent_t), sent_t
 	return pn;
 }
 
+//toma los datos de una estructura y carga una del tipo trkpt
 struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const double lon, const double ele){
 	struct trkpt *aux;
 
@@ -117,6 +124,7 @@ struct trkpt *cargar_trkpt(const struct fecha *fecha, const double lat, const do
 	return aux;
 }
 
+//toma una estructura cualquiera de las sentencias y pasa los datos correspondientes para crear la trkpt de acuerdo al tipo de sentencia
 struct trkpt *proc_sentencias(void * dato, sent_t tipo){
 	if(!dato){
 		return NULL;

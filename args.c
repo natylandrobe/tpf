@@ -123,11 +123,12 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 	return ST_OK;
 }
 
+
+//toma el argumento y por interfaz devuelve el tipo de argumento correspondiente
 status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 
 	const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
 	size_t i;
-	char *argumento;
 
 	if(!argv || !argp){
 		return ST_EPTNULL;
@@ -150,12 +151,6 @@ status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 	}
 
 	else if(argum == ARG_C){
-
-		argumento = strdup(argv[index]);
-							
-		if(argumento == NULL){
-			return ST_ENOMEM;
-		}
 
 		for(i = 0; i < CANT_ARGS; i++){
 			if(!strcmp(argv[index], dic_args[i])){

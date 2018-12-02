@@ -1,7 +1,7 @@
 #include "files.h"
 
 
-
+// abre los archivos correspondientes segun los argumentos ingresados
 status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
     if(!fin || !fout || !flog || !arg){
@@ -14,7 +14,6 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
 	else{
 		if((*flog = fopen(arg->logfile_n, "w")) == NULL){
-		fprintf(stderr, "%s\n", "MSJ_ERR_OPENL");//cambiar mensaje
 		return ST_EFILEO;
 		}
 	}
@@ -25,8 +24,11 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
 	else{
 		if((*fin = fopen(arg->infile_n, "rb")) == NULL){
-		fprintf(*flog, "%s\n", "MSJ_ERR_OPENI");//cambiar mensaje
-		return ST_EFILEO;
+
+			if(fclose(*flog)){
+            	return ST_EFILEC;
+        	}
+			return ST_EFILEO;
 		}
 	}
 	if(!strcmp(arg->outfile_n, DEFAULT_OUTFILE)){
@@ -35,7 +37,14 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
 	else{
 		if((*fout = fopen(arg->outfile_n, "w")) == NULL){
-			fprintf(*flog, "%s\n", "MSJ_ERR_OPENO");//cambiar mensaje
+			if(fclose(*fin)){
+            	return ST_EFILEC;
+       		}
+
+			if(fclose(*flog)){
+            	return ST_EFILEC;
+        	}
+
 			return ST_EFILEO;
 		}
 	}
@@ -43,6 +52,7 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
     return ST_OK;
 }
 
+// cierra los arhivos abiertos
 status_t cerrar_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
     if(!fin || !fout || !flog || !arg){

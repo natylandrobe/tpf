@@ -11,7 +11,6 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	struct fecha fecha;
 	char linea[MAX_LINE];
 	struct args arg;
-	//struct data track;	
 	status_t st;
 	sent_t t;
 	size_t i = 0;
@@ -20,33 +19,62 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	debug_t deb;
 
 	if((st = defaultFecha(&fecha)) != ST_OK){
-		imp_log(flog, &st, NULL, NULL);
+		imp_log(stderr, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = defaultArgs(&arg)) != ST_OK){
-		imp_log(flog, &st, NULL, NULL);
+		imp_log(stderr, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if((st = takeArgs(argc, argv, &arg)) == ST_HELP){
 
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(stderr, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
 		printHelp();
 		return EXIT_SUCCESS;
 	}
 	
 	else if(st != ST_OK){
-		imp_log(flog, &st, NULL, NULL);
+
+		imp_log(stderr, &st, NULL, NULL);
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(stderr, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+		
 		return EXIT_SUCCESS;
 	}
 
 	if((st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
-		imp_log(flog, &st, NULL, NULL);
+
+		imp_log(stderr, &st, NULL, NULL);
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(stderr, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 
 	if((st = printMetadata(arg.name, &fecha, fout)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
+		return EXIT_SUCCESS;
+		}
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 
@@ -54,6 +82,17 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 
 	if((st = crear_lista(&lista)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
+		return EXIT_SUCCESS;
+		}
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 
@@ -88,26 +127,47 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 						}
 					
 				case RMC:
-					if (cargar_struct_rmc(linea,&Rmc,&fecha)){
+					if ((st = cargar_struct_rmc(linea,&Rmc,&fecha)) == ST_OK){
+						deb = MSJ_OK;
+						imp_log(flog, NULL, NULL, &deb);
 
-						if (agregar_nodo(&Rmc, &lista,t)==ST_OK){
+						if ((st = agregar_nodo(&Rmc, &lista,t)) == ST_OK){
+							deb = CARGA_MSJ;
+							imp_log(flog, NULL, NULL, &deb);
 							i++;
+							break;
+						}
+						else{
+							imp_log(flog, &st, NULL, NULL);
+							break;
 						}
 					}
-			
-					break;
+
+					else{
+						imp_log(flog, &st, NULL, NULL);
+						break;
+					}
+
 				case ZDA :
-				if(cargar_struct_zda(linea,&Zda,&fecha)){
-					;
-				}
-	
+				if((st = cargar_struct_zda(linea,&Zda,&fecha)) == ST_OK){
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
 					break;
+				}
+
+				else{
+					imp_log(flog, &st, NULL, NULL);	
+					break;
+				}
 				case NING: 
-			
-				printf("%s\n","MAL");
-		
+					break;		
 			
 			}
+		}
+
+		if(!feof(fin)){
+			deb = LIST_FULL;
+			imp_log(flog, NULL, NULL, &deb);
 		}
 	}
 
@@ -116,6 +176,17 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 			if(proc_ubx != S_OK){
 				imp_log(flog, NULL, &proc_ubx, NULL);
 				if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){
+
+					if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+						imp_log(flog, &st, NULL, NULL);
+						return EXIT_SUCCESS;
+					}
+
+					if((st = liberar_args(&arg)) != ST_OK){
+						imp_log(flog, &st, NULL, NULL);
+						return EXIT_SUCCESS;
+					}
+
 					return EXIT_SUCCESS;
 				}
 			}
@@ -131,22 +202,61 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 
 	if((st = imprimir_lista(lista, fout, flog)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
+		return EXIT_SUCCESS;
+		}
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 
 	if((st = printTrkC(fout)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
+		return EXIT_SUCCESS;
+		}
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 
 	if((st = destruir_lista(&lista)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
+		imp_log(flog, &st, NULL, NULL);
+		return EXIT_SUCCESS;
+		}
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 	
 
 	if((st = cerrar_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(flog, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+
 		return EXIT_SUCCESS;
 	}
 

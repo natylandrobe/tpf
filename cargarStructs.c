@@ -2,7 +2,7 @@
 
 #define INDEX_FECHA_RMC 9
 
-/* Carga la fecha del sistema a la estructura de tipo fecha */
+//procesa la sentencia zda, carga la estructura y asigna su fecha a la estructura de fecha date
 status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
@@ -66,7 +66,7 @@ status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
        if(*check != END_STR){
                 return ST_SENTINV;
         }
-        // por que el zda tiene que actualizar la fecha
+   
         if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio)){
         	return ST_SENTINV ;
         }
@@ -86,7 +86,7 @@ status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
 
-
+//procesa la sentencia rmc, carga la estructura y actualiza la fecha date
 status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 
         char *str, *check;
@@ -158,7 +158,7 @@ status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         return ST_OK;
 }
 
-
+//procesa la sentencia gga y carga la estructura
 status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
 
 
@@ -245,7 +245,7 @@ status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
 
 
 
-
+//carga la estructura fecha con la del sistema
 status_t defaultFecha(struct fecha *def){
 
 	time_t rawtime;
@@ -272,6 +272,7 @@ status_t defaultFecha(struct fecha *def){
 
 }
 
+//carga la estructura args con los argumentos default
 status_t defaultArgs(struct args *arg){
 
 	if(!arg){

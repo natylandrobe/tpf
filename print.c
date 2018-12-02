@@ -1,6 +1,6 @@
 #include "print.h"
 
-/* Imprime la metadata en XML*/
+/* Imprime la metadata en XML en el archivo de salida*/
 status_t printMetadata(char *name, struct fecha *fecha, FILE *fout){
 
    	if(!name || !fecha || !fout){
@@ -31,7 +31,7 @@ status_t printMetadata(char *name, struct fecha *fecha, FILE *fout){
 	return ST_OK;
 }
 
-/* Imprime cierres de los tags Trackseg, Track y gpx */
+/* Imprime cierres de los tags Trackseg, Track y gpx en el archivo de salida*/
 status_t printTrkC(FILE *fout){
 
 	if(!fout){
@@ -45,7 +45,7 @@ status_t printTrkC(FILE *fout){
 	return ST_OK;
 }
 
-/* Imprime la estructura en formato XML */
+/* Imprime la estructura en formato XML en el archivo de salida*/
 status_t printStruct(struct trkpt *track, FILE *fout){
 
 	if(!track || !fout){
@@ -75,6 +75,7 @@ void printHelp(void){
 	printf("%s\n", HELP);
 }
 
+//de acuerdo al tipo de pointer ingresado imprime mensajes de error, warning y debug en el archivo log
 void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb){
 
     if(!flog){

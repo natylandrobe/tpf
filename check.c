@@ -1,6 +1,6 @@
 #include "check.h"
 
-/*verifica que tipo de nma es*/
+/*toma una sentencia y devuelve que tipo de nma es*/
 
 sent_t checkLine(char *s, FILE *flog){
 
@@ -33,7 +33,7 @@ sent_t checkLine(char *s, FILE *flog){
 			return NING;
 		}
 	}
-	else if(strstr(s, CHECK_RMC) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	else if(strstr(s, CHECK_RMC) != NULL){
 		if(nmea_checksum(s) == strtol(checkSum, NULL, 16)){
 			deb = ID_D;
 			imp_log(flog, NULL, NULL, &deb);
@@ -45,7 +45,7 @@ sent_t checkLine(char *s, FILE *flog){
 			return NING;
 		}
 	}
-	else if(strstr(s, CHECK_ZDA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	else if(strstr(s, CHECK_ZDA) != NULL){
 	
 		if(nmea_checksum(s) == strtol(checkSum, NULL, 16)){
 			deb = ID_D;
@@ -59,6 +59,8 @@ sent_t checkLine(char *s, FILE *flog){
 		}
 	}
 	else{
+		debug = S_ID_INV;
+		imp_log(flog, NULL, &debug, NULL);
 		return NING;
 	}
 }
