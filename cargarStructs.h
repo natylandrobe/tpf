@@ -9,6 +9,7 @@
 #define AUX_PARA_MIN_SEG 100
 #define ASTERISCO "*"
 
+
 //para el GGA
 #define DELIM ","
 #define CANT_TOKEN_GGA 15
@@ -36,6 +37,9 @@
 #define INDEX_FECHA_RMC 9
 #define INDEX_HORARIO_RMC 1
 #define INDEX_STATUS_RMC 2
+#define AUX_1_PARA_FECHA 10000
+#define AUX_2_PARA_FECHA 100
+#define AUX_3_PARA_FECHA 2000
 
 //Para el ZDA
 #define CANT_TOKEN_ZDA 6
