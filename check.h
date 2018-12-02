@@ -3,6 +3,7 @@
 
 
 #include "structData.h"
+#include "print.h"
 
 #define CHECK_GGA "$GPGGA,"
 #define CHECK_RMC "$GPRMC,"
@@ -26,7 +27,7 @@
 #define CANT_CSUM 2
 
 unsigned char nmea_checksum(const char * s);
-sent_t checkLine(char *s);
+sent_t checkLine(char *s, FILE *flog);
 bool checkDia(int dia); 
 bool checkMes(int mes);
 bool checkAnio(int anio);

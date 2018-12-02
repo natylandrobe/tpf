@@ -50,74 +50,64 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 		return EXIT_SUCCESS;
 	}
 
+
+
 	if((st = crear_lista(&lista)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 		return EXIT_SUCCESS;
 	}
 
 	if(arg.protocol == NMEA){
-	// este while es para hacer pruebas, no es parte del programa
-		while(fgets(linea, MAX_LINE, fin)){
 
-			fprintf(fout, "%s", linea);
+		while(i < arg.maxlen && fgets(linea, MAX_LINE, fin)){
 
-			t=checkLine(linea);
+			t = checkLine(linea, flog);
+
 			switch (t){
-			case GGA : if ( cargar_struct_gga(linea,&Gga,&fecha)){
-			//para probar
-			if (agregar_nodo(&Gga, &lista,t)==ST_OK)
-				printf("%s\n","biengga");
+				case GGA: 
+					if((st = cargar_struct_gga(linea,&Gga,&fecha)) == ST_OK){
 
-			printf("%s\n","BIENGGA");
-			printf("%.3f\n",Gga.lat);
-			printf("%.3f\n",Gga.lon);
-			printf("%.1f\n",Gga.ele);
-			printf("%.1f\n",Gga.hdop);
-			printf("%.1f\n",Gga.separacion);
-			printf("%li\n",Gga.cantSat);
-			printf("%i\n",fecha.hora);
-			printf("%i\n",fecha.minutos);
-			printf("%.3f\n",fecha.segundos);
-							} break;
-			case RMC :
-			if (cargar_struct_rmc(linea,&Rmc,&fecha)){
-		//para probar
-			if (agregar_nodo(&Rmc, &lista,t)==ST_OK)
-			printf("%s\n","bienrmc");
+						deb = MSJ_OK;
+						imp_log(flog, NULL, NULL, &deb);
 
-			printf("%s\n","BIENRM");
-			printf("%.3f\n",Rmc.lat);
-			printf("%.3f\n",Rmc.lon);
-			printf("%c\n",Rmc.status);
-			printf("%i\n",fecha.dia);
-			printf("%i\n",fecha.mes);
-			printf("%i\n",fecha.anio);
-			printf("%i\n",fecha.hora);
-			printf("%i\n",fecha.minutos);
-			printf("%.3f\n",fecha.segundos);							
-			}
-						 break;
-			case ZDA :
-			if(cargar_struct_zda(linea,&Zda,&fecha)){
-			//para probar
-			Gga.f=Zda.f;
-			if (agregar_nodo(&Gga, &lista,t)==ST_OK)
-				printf("%s\n","bienzda");
-			printf("%s\n","BIENZD");
-			printf("%i\n",fecha.dia);
-			printf("%i\n",fecha.mes);
-			printf("%i\n",fecha.anio);
-			printf("%i\n",fecha.hora);
-			printf("%i\n",fecha.minutos);
-			printf("%.3f\n",fecha.segundos);
-			printf("%i\n",Zda.time_zone);
-			printf("%i\n",Zda.dif_tmzone);
-			}
-				break;
-			case NING: printf("%s\n","MAL");
+						if((st = agregar_nodo(&Gga, &lista, t)) == ST_OK){
+							deb = CARGA_MSJ;
+							imp_log(flog, NULL, NULL, &deb);
+							i++;
+							break;
+						}
+
+						else{
+							imp_log(flog, &st, NULL, NULL);
+							break;
+						}
+					}
+					else{
+							imp_log(flog, &st, NULL, NULL);
+							break;
+						}
+					
+				case RMC:
+					if (cargar_struct_rmc(linea,&Rmc,&fecha)){
+
+						if (agregar_nodo(&Rmc, &lista,t)==ST_OK){
+							i++;
+						}
+					}
+			
+					break;
+				case ZDA :
+				if(cargar_struct_zda(linea,&Zda,&fecha)){
+					;
+				}
+	
+					break;
+				case NING: 
+			
+				printf("%s\n","MAL");
 		
+			
 			}
-		
 		}
 	}
 
@@ -133,6 +123,7 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 		if(proc_ubx != S_EREAD){
 			deb = LIST_FULL;
 			imp_log(flog, NULL, NULL, &deb);
+
 		}
 	}
 

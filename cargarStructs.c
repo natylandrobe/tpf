@@ -3,7 +3,7 @@
 #define INDEX_FECHA_RMC 9
 
 /* Carga la fecha del sistema a la estructura de tipo fecha */
-bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
+status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
         char *str, *check;
@@ -11,8 +11,8 @@ bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         double time_zone,dif_tmzone;
         double dia,mes,anio,horario;
 
-       if(!s ){
-               return false;
+       if(!s || !Zda || !date){
+               return ST_EPTNULL;
         }
 
         str = strtok(s, DELIM);
@@ -28,31 +28,31 @@ bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         horario= strtod(tokens[INDEX_HORARIO_ZDA], &check);
 
         if(*check != END_STR){
-               return false;
+               return ST_SENTINV;
         }
 
         dia= strtod(tokens[INDEX_DIA_ZDA], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         mes= strtod(tokens[INDEX_MES_ZDA], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         anio= strtod(tokens[INDEX_ANIO_ZDA], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         time_zone = strtod(tokens[INDEX_TIME_ZONE_ZDA], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
         str= strtok(tokens[INDEX_DIF_TIME_ZONE_AUX_ZDA],ASTERISCO);
                 i = 0;
@@ -64,11 +64,11 @@ bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         dif_tmzone = strtod(token[INDEX_DIF_TIME_ZONE_ZDA], &check);
 
        if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
         // por que el zda tiene que actualizar la fecha
         if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio)){
-        	return false ;
+        	return ST_SENTINV ;
         }
 
         Zda->f.dia =dia;
@@ -81,13 +81,13 @@ bool cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         Zda->time_zone = time_zone;
         Zda->dif_tmzone =dif_tmzone;
         
-        return true;
+        return ST_OK;
 }
 
 
 
 
-bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
+status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 
         char *str, *check;
         char status;
@@ -95,8 +95,8 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         double lat, lon;
         double horario,dia,mes,anio,fecha;
        
-     	if(!s){
-                return false;
+     	if(!s || !RMC || !date){
+                return ST_EPTNULL;
         }
 
         str = strtok(s, DELIM);
@@ -110,12 +110,12 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         horario= strtod(tokens[INDEX_HORARIO_RMC], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         if(strcmp(tokens[INDEX_STATUS_RMC],COMPARE_STATUS_RMC_VOID)==0){
 			status=STATUS_RMC_VOID;
-			return false;
+			
         }
 
         if (strcmp(tokens[INDEX_STATUS_RMC],COMPARE_STATUS_RMC_ACT)==0){
@@ -125,7 +125,7 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         fecha= strtod(tokens[INDEX_FECHA_RMC], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         dia=(int)fecha/AUX_1_PARA_FECHA ;
@@ -133,7 +133,7 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         anio=(int)fecha%AUX_2_PARA_FECHA +AUX_3_PARA_FECHA;
 
         if (!checkDia(dia) || !checkMes(mes) || !checkAnio(anio)){
-            return false ;
+            return ST_SENTINV ;
         }
 
 
@@ -141,7 +141,7 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         lon = convertirLon(tokens[INDEX_LON_RMC], tokens[INDEX_LON_CARD_RMC]);
 
         if(!checkMembersrmc(lat, lon)){
-                return false;
+                return ST_SENTINV;
         }
 		
         Rmc->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
@@ -155,11 +155,11 @@ bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         Rmc->lon = lon;
         Rmc->status= status;
         
-        return true;
+        return ST_OK;
 }
 
 
-bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
+status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
 
 
         char *str, *check;
@@ -169,8 +169,8 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
         double horario;
         cal_t calidad;
 
-       if(!s ){
-             return false;
+       if(!s || !Gga || !date){
+             return ST_EPTNULL;
     	}
 
         str = strtok(s, DELIM);
@@ -184,38 +184,38 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
         horario= strtod(tokens[INDEX_HORARIO_GGA], &check);
 
         if(*check != END_STR){
-               return false;
+               return ST_SENTINV;
         }
 
         
         cant = strtol(tokens[INDEX_CANT], &check, 10);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         hdop = strtod(tokens[INDEX_HDOP], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         ele = strtod(tokens[INDEX_ELE], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         separacion= strtod(tokens[INDEX_SEP], &check);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         cal = strtol(tokens[INDEX_CAL], &check, 10);
 
         if(*check != END_STR){
-                return false;
+                return ST_SENTINV;
         }
 
         calidad = convertirCal(cal);
@@ -223,15 +223,15 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
         lon = convertirLon(tokens[INDEX_LON], tokens[INDEX_LON_CARD]);
 
         if(!checkMembers(lat, lon, calidad, cant)){
-                return false;
+                return ST_SENTINV;
         }
 
-  		Gga->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
+        Gga->f.hora= horario/AUX_PARA_HOR_MIN_SEG;
         Gga->f.minutos = ((int)horario%AUX_PARA_HOR_MIN_SEG)/AUX_PARA_MIN_SEG;
         Gga->f.segundos = horario-Gga->f.hora*AUX_PARA_HOR_MIN_SEG-Gga->f.minutos*AUX_PARA_MIN_SEG;
-        date->hora=Gga->f.hora;
-        date->minutos=Gga->f.minutos;
-        date->segundos=Gga->f.segundos;
+        Gga->f.anio = date->anio;
+        Gga->f.mes = date->mes;
+        Gga->f.dia = date->dia;
         Gga->lat = lat;
         Gga->lon = lon;
         Gga->calidad = calidad;
@@ -240,7 +240,7 @@ bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date){
         Gga->ele = ele;
         Gga->separacion = separacion;
         
-        return true;
+        return ST_OK;
 }
 
 

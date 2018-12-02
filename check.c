@@ -2,11 +2,13 @@
 
 /*verifica que tipo de nma es*/
 
-sent_t checkLine(char *s){
+sent_t checkLine(char *s, FILE *flog){
 
+	debug_t deb;
+	ubxst_t debug;
 	char checkSum[CANT_CSUM];
 
-	if(!s){
+	if(!s || !flog){
 		
 		return NING;
 	}
@@ -15,19 +17,50 @@ sent_t checkLine(char *s){
 	checkSum[0] = *(strrchr(s, ASTERISCO_C) + 1);
 	checkSum[1] = *(strrchr(s, ASTERISCO_C) + 2);
 
-	if(strstr(s, CHECK_GGA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
-	
-		return GGA;
+	deb = SYNC;
+	imp_log(flog, NULL, NULL, &deb);
+
+	if(strstr(s, CHECK_GGA) != NULL){
+		
+		if(nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+			deb = ID_D;
+			imp_log(flog, NULL, NULL, &deb);
+			return GGA;
+		}
+		else{
+			debug = S_CK_INV;
+			imp_log(flog, NULL, &debug, NULL);
+			return NING;
+		}
 	}
-	if(strstr(s, CHECK_RMC) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
-	
-		return RMC;
+	else if(strstr(s, CHECK_RMC) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+		if(nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+			deb = ID_D;
+			imp_log(flog, NULL, NULL, &deb);
+			return RMC;
+		}
+		else{
+			debug = S_CK_INV;
+			imp_log(flog, NULL, &debug, NULL);
+			return NING;
+		}
 	}
-	if(strstr(s, CHECK_ZDA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+	else if(strstr(s, CHECK_ZDA) != NULL && nmea_checksum(s) == strtol(checkSum, NULL, 16)){
 	
-		return ZDA;
+		if(nmea_checksum(s) == strtol(checkSum, NULL, 16)){
+			deb = ID_D;
+			imp_log(flog, NULL, NULL, &deb);
+			return ZDA;
+		}
+		else{
+			debug = S_CK_INV;
+			imp_log(flog, NULL, &debug, NULL);
+			return NING;
+		}
 	}
-	return NING;
+	else{
+		return NING;
+	}
 }
 
 /* Calcula la suma de verificacion */

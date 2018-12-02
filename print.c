@@ -101,6 +101,9 @@ void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb){
             case ST_EFILEC:
                 fprintf(flog, "%s\n", MSJ_EFILEC);
                 break;
+            case ST_SENTINV:
+                fprintf(flog, "%s\n", MSJ_ESENTINV);
+                break;
             default:
                 return ;
         }

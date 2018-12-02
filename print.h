@@ -41,6 +41,7 @@
 #define MSJ_EAGR "[WARNING] No se pudo agregar el nodo"
 #define MSJ_EFILEO "[ERROR] No se pudo abrir correctamente un archivo"
 #define MSJ_EFILEC "[ERROR] No se pudo cerrar correctamente un archivo"
+#define MSJ_ESENTINV "[WARNING] Se descarta sentencia invalida"
 #define MSJ_CLASSINV "[WARNING] No se reconoce la clase"
 #define MSJ_IDINV "[WARNING] No se reconoce el ID"
 #define MSJ_CKINV "[ERROR] No concuerda el checksum"

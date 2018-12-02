@@ -24,7 +24,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 
 			else if(st == ST_OK && argc > 1+i){
 				switch(argp){
-					case NAME:
+					case NAME_A:
 						if(*argv[i+1] == ARG_C){
 							return ST_INV;	
 						}
@@ -139,7 +139,7 @@ status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 
 			if(argum == dic_args[i][ARGC_IND]){
 				*argp = i;
-				if(*argp == HELP){
+				if(*argp == HELP_A){
 					return ST_HELP;
 				}
 				return ST_OK;
@@ -161,7 +161,7 @@ status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 			if(!strcmp(argv[index], dic_args[i])){
 				*argp = i;
 		
-				if(*argp == HELP){
+				if(*argp == HELP_A){
 					return ST_HELP;
 				}
 				return ST_OK;

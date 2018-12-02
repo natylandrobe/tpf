@@ -16,9 +16,9 @@
 
 #define TIPO_LEN 3
 
-typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM, ST_EAGR, ST_EFILEO, ST_EFILEC} status_t;
+typedef enum {ST_INV, ST_HELP, ST_OK, ST_EPTNULL, ST_ENOMEM, ST_EAGR, ST_EFILEO, ST_EFILEC, ST_SENTINV} status_t;
 typedef enum{invalido, fix_GPS, fix_DGPS, fix_PPS, real_time_kinematic, float_rtk, estimada, manual, simulacion} cal_t; 
-typedef enum{HELP, NAME, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
+typedef enum{HELP_A, NAME_A, PROTOCOL, INFILE, OUTFILE, LOGFILE, MAXLEN} args_t;
 extern const char dic_args[][MAX_STR];
 typedef enum{INV, UBX, NMEA} protocol_t;
 typedef enum{GGA, RMC, ZDA, NAV_PVT, TIM_TOS, NAV_POSLLH, NING} sent_t;

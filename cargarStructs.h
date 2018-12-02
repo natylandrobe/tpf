@@ -29,7 +29,7 @@
 #define STATUS_RMC_VOID 'V'
 #define COMPARE_STATUS_RMC_ACT "A"
 #define COMPARE_STATUS_RMC_VOID "V"
-#define CANT_TOKEN_RMC 10
+#define CANT_TOKEN_RMC 12
 #define INDEX_LAT_RMC 3
 #define INDEX_LAT_CARD_RMC 4
 #define INDEX_LON_RMC 5 
@@ -65,10 +65,11 @@
 double convertirLon(const char lon[], char * cardinal);
 double convertirLat(const char lat[], char * cardinal);
 cal_t convertirCal(long int cal);
-bool cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
-bool cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);
-bool cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date);
+status_t cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
+status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);
+status_t cargar_struct_gga(char *s,struct s_GGA *Gga,struct fecha *date);
 status_t defaultFecha(struct fecha *def);
+status_t defaultArgs(struct args *arg);
 
 #endif
 
