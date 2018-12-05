@@ -50,6 +50,19 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 		return EXIT_SUCCESS;
 	}
 
+	if(arg.protocol == INV){
+		st = ST_INV;
+		
+		imp_log(stderr, &st, NULL, NULL);
+
+		if((st = liberar_args(&arg)) != ST_OK){
+			imp_log(stderr, &st, NULL, NULL);
+			return EXIT_SUCCESS;
+		}
+		
+		return EXIT_SUCCESS;
+	}
+
 	if((st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
 
 		imp_log(stderr, &st, NULL, NULL);
@@ -172,7 +185,7 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	}
 
 	else if(arg.protocol == UBX){
-		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog)) != S_EREAD){
+		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog, &arg)) != S_EREAD){
 			if(proc_ubx != S_OK){
 				imp_log(flog, NULL, &proc_ubx, NULL);
 				if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){

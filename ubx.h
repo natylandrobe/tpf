@@ -17,6 +17,10 @@
 #define PVT_BUFFSZ 96
 #define TIM_TOS_BUFFSZ 60
 #define POSLLH_BUFFSZ 32
+#define CLASS_IND 0
+#define ID_IND 1
+#define LARGO_MSB_IND 3
+#define LARGO_LSB_IND 2
 
 //defines para calc_largo
 #define MSB_IND 1
@@ -101,7 +105,8 @@
 
 // typedef enum{S_EPTNULL, S_ENOMEM, S_EREAD, S_CLASS_INV, S_ID_INV, S_CK_INV, S_LARGO_INV, S_FIX_INV, S_EAGR, S_OK} ubxst_t;
 unsigned int calc_largo(unsigned char info[]);
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog);
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, struct args *arg);
+ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog);
 ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin);
 ubxst_t calc_fecha(unsigned char *buff, struct fecha *fecha, unsigned char id);
 ubxst_t cargar_fecha(void *dato, struct fecha *funi, unsigned char id, unsigned char *buff, ubxst_t (*proc_fecha)(unsigned char *, struct fecha *, unsigned char));

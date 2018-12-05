@@ -10,7 +10,15 @@
 [DEBUG] ID detectado
 [DEBUG] Mensaje recolectado
 [DEBUG] Mensaje cargado a la lista
-[WARNING] Se descartan mensajes por lista llena
+[DEBUG] Buscando bytes de sincronismo
+[DEBUG] ID detectado
+[DEBUG] Mensaje recolectado
+[DEBUG] Buscando bytes de sincronismo
+[DEBUG] ID detectado
+[DEBUG] Mensaje recolectado
+[DEBUG] Mensaje cargado a la lista
+[DEBUG] Buscando bytes de sincronismo
+[DEBUG] Mensaje impreso
 [DEBUG] Mensaje impreso
 [DEBUG] Mensaje impreso
 [DEBUG] Mensaje impreso

@@ -61,7 +61,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						arg->infile_n = strdup(argv[++i]);
 
 						if(arg->infile_n == NULL){
-							free(arg->infile_n);
+
 							return ST_ENOMEM;
 						}
 						break;
@@ -76,7 +76,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 						arg->outfile_n = strdup(argv[++i]);
 
 						if(arg->outfile_n == NULL){
-							free(arg->outfile_n);
+
 							return ST_ENOMEM;
 						}
 
@@ -92,7 +92,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 							arg->logfile_n = strdup(argv[++i]);
 
 							if(arg->logfile_n == NULL){
-								free(arg->logfile_n);
+
 								return ST_ENOMEM;
 							}
 

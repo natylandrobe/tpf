@@ -1,7 +1,7 @@
 #include "ubx.h"
 
 //lee la sentencia ubx, procesa los datos y de ser correctos, carga las estructuras y las agrega a la lista si corresponde
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog){
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, struct args *arg){
 	unsigned char info_largo[LARGO_CK_SZ], *buff;
 	unsigned int id, largo;
 	int c;
@@ -27,188 +27,196 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 		}
 	}
 
-	if((c = fgetc(fin)) == EOF){
-
-		return S_EREAD;
+	if(!(strcmp(arg->infile_n, DEFAULT_INFILE))){
+		return procesar_standard(fecha, lista, index, agregar_nodo, flog);
 	}
 
-	switch(c){
-		case NAV_CL:
-			if((id = fgetc(fin)) == EOF){
-				return S_EREAD;
-			}
+	else{
+
+		if((c = fgetc(fin)) == EOF){
+			return S_EREAD;
+		}
+
+		switch(c){
+			case NAV_CL:
+				if((id = fgetc(fin)) == EOF){
+					return S_EREAD;
+				}	
 			
-			if(id != PVT_ID && id != POSLLH_ID){
-				return S_ID_INV;
-			}
-			break;
-		case TIM_CL:
-			if((id = fgetc(fin)) == EOF){
-				return S_EREAD;
-			}
-			if(id != TIM_TOS_ID){
-				return S_ID_INV;
-			}
-			break;
-		default:
-			return S_CLASS_INV;
-	}
+				if(id != PVT_ID && id != POSLLH_ID){
+					return S_ID_INV;
+				}
 
-	deb = ID_D;
-	imp_log(flog, NULL, NULL, &deb);
+				break;
+			case TIM_CL:
+				if((id = fgetc(fin)) == EOF){
+					return S_EREAD;
+				}
+				if(id != TIM_TOS_ID){
+					return S_ID_INV;
+				}
 
-	if(fread(info_largo, sizeof(char), LARGO_CK_SZ, fin) != LARGO_CK_SZ){
-		return S_EREAD;
-	}
+				break;
+			default:
+				return S_CLASS_INV;
+		}
 
-	largo = calc_largo(info_largo);
+		deb = ID_D;
+		imp_log(flog, NULL, NULL, &deb);
+
+		if(fread(info_largo, sizeof(char), LARGO_CK_SZ, fin) != LARGO_CK_SZ){
+			return S_EREAD;
+		}
+
+		largo = calc_largo(info_largo);
 	
+	
+		if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS_L) || (id == POSLLH_ID && largo != POSLLH_L)){
+			return S_LARGO_INV;
+		}
 
-	if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS_L) || (id == POSLLH_ID && largo != POSLLH_L)){
-		return S_LARGO_INV;
+
+		if(fseek(fin, POS_CK, SEEK_CUR)){
+			return S_EREAD;
+		}
+
+		switch(id){
+			case PVT_ID:
+				buff = (unsigned char *)malloc(sizeof(unsigned char)*PVT_BUFFSZ);
+				if(!buff){
+					return S_ENOMEM;
+				}
+
+				if(fread(buff, sizeof(unsigned char), PVT_BUFFSZ, fin) != PVT_BUFFSZ){
+					free(buff);
+					return S_EREAD;
+				}
+
+				if((cks = ubx_cksum(buff, PVT_BUFFSZ, fin)) == S_OK){
+
+					pvt_s = (struct s_PVT *)malloc(sizeof(struct s_PVT));
+					if(!pvt_s){
+						free(buff);
+						return S_EPTNULL;
+					}
+					if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
+						deb = MSJ_OK;
+						imp_log(flog, NULL, NULL, &deb);
+					}
+
+					else{
+						free(buff);
+						free(pvt_s);
+						return cargar_s;
+					}
+
+					if((*add_nodo)(pvt_s, lista, NAV_PVT) == ST_OK){
+						deb = CARGA_MSJ;
+						imp_log(flog, NULL, NULL, &deb);
+						(*index)++;
+						free(pvt_s);
+						free(buff);
+						break;
+					}
+					else{
+						free(buff);
+						free(pvt_s);
+						return S_EAGR;
+					}
+
+				}
+
+				else{
+					free(buff);
+					return cks;
+				}
+			case TIM_TOS_ID:
+				buff = (unsigned char *)malloc(sizeof(unsigned char)*TIM_TOS_BUFFSZ);
+				if(!buff){
+					return S_ENOMEM;
+				}
+
+				if(fread(buff, sizeof(unsigned char), TIM_TOS_BUFFSZ, fin) != TIM_TOS_BUFFSZ){
+					free(buff);
+					return S_EREAD;
+				}
+
+				if((cks = ubx_cksum(buff, TIM_TOS_BUFFSZ, fin)) == S_OK){
+					tt_s = (struct s_TIM_TOS *)malloc(sizeof(struct s_TIM_TOS));
+					if(!tt_s){
+						free(buff);
+						return S_EPTNULL;
+					}
+					if((cargar_s = cargar_sTIMTOS(tt_s, fecha, buff)) == S_OK){
+						deb = MSJ_OK;
+						imp_log(flog, NULL, NULL, &deb);
+						free(buff);
+						free(tt_s);
+						break;
+					}
+
+					else{
+						free(buff);
+						free(tt_s);
+						return cargar_s;
+					}
+				}
+
+				else{
+					free(buff);
+					return cks;
+				}
+			case POSLLH_ID:
+				buff = (unsigned char *)malloc(sizeof(unsigned char)*POSLLH_BUFFSZ);
+				if(!buff){
+					return S_ENOMEM;
+				}
+
+				if(fread(buff, sizeof(unsigned char), POSLLH_BUFFSZ, fin) != POSLLH_BUFFSZ){
+					free(buff);
+					return S_EREAD;
+				}
+
+				if((cks = ubx_cksum(buff, POSLLH_BUFFSZ, fin)) == S_OK){
+					posllh_s = (struct s_POSLLH *)malloc(sizeof(struct s_POSLLH));
+					if(!posllh_s){
+						free(buff);
+						return S_EPTNULL;
+					}
+					if((cargar_s = cargar_sPOSLLH(posllh_s, fecha, buff)) == S_OK){
+						deb = MSJ_OK;
+						imp_log(flog, NULL, NULL, &deb);
+					}
+
+					else{
+						free(buff);
+						free(posllh_s);
+						return cargar_s;
+					}
+					if((*add_nodo)(posllh_s, lista, NAV_POSLLH) == ST_OK){
+						deb = CARGA_MSJ;
+						imp_log(flog, NULL, NULL, &deb);
+						(*index)++;
+						free(posllh_s);
+						free(buff);
+						break;
+					}
+					else{
+						free(buff);
+						free(posllh_s);
+						return S_EAGR;
+					}
+				}
+
+				else{
+					free(buff);
+					return cks;
+				}
+		}
+
 	}
-
-	if(fseek(fin, POS_CK, SEEK_CUR)){
-		return S_EREAD;
-	}
-
-	switch(id){
-		case PVT_ID:
-			buff = (unsigned char *)malloc(sizeof(unsigned char)*PVT_BUFFSZ);
-			if(!buff){
-				return S_ENOMEM;
-			}
-
-			if(fread(buff, sizeof(unsigned char), PVT_BUFFSZ, fin) != PVT_BUFFSZ){
-				free(buff);
-				return S_EREAD;
-			}
-
-			if((cks = ubx_cksum(buff, PVT_BUFFSZ, fin)) == S_OK){
-
-				pvt_s = (struct s_PVT *)malloc(sizeof(struct s_PVT));
-				if(!pvt_s){
-					free(buff);
-					return S_EPTNULL;
-				}
-				if((cargar_s = cargar_sPVT(pvt_s, fecha, buff)) == S_OK){
-					deb = MSJ_OK;
-					imp_log(flog, NULL, NULL, &deb);
-				}
-
-				else{
-					free(buff);
-					free(pvt_s);
-					return cargar_s;
-				}
-
-				if((*add_nodo)(pvt_s, lista, NAV_PVT) == ST_OK){
-					deb = CARGA_MSJ;
-					imp_log(flog, NULL, NULL, &deb);
-					(*index)++;
-					free(pvt_s);
-					free(buff);
-					break;
-				}
-				else{
-					free(buff);
-					free(pvt_s);
-					return S_EAGR;
-				}
-
-			}
-
-			else{
-				free(buff);
-				return cks;
-			}
-		case TIM_TOS_ID:
-			buff = (unsigned char *)malloc(sizeof(unsigned char)*TIM_TOS_BUFFSZ);
-			if(!buff){
-				return S_ENOMEM;
-			}
-
-			if(fread(buff, sizeof(unsigned char), TIM_TOS_BUFFSZ, fin) != TIM_TOS_BUFFSZ){
-				free(buff);
-				return S_EREAD;
-			}
-
-			if((cks = ubx_cksum(buff, TIM_TOS_BUFFSZ, fin)) == S_OK){
-				tt_s = (struct s_TIM_TOS *)malloc(sizeof(struct s_TIM_TOS));
-				if(!tt_s){
-					free(buff);
-					return S_EPTNULL;
-				}
-				if((cargar_s = cargar_sTIMTOS(tt_s, fecha, buff)) == S_OK){
-					deb = MSJ_OK;
-					imp_log(flog, NULL, NULL, &deb);
-					free(buff);
-					free(tt_s);
-					break;
-				}
-
-				else{
-					free(buff);
-					free(tt_s);
-					return cargar_s;
-				}
-			}
-
-			else{
-				free(buff);
-				return cks;
-			}
-		case POSLLH_ID:
-			buff = (unsigned char *)malloc(sizeof(unsigned char)*POSLLH_BUFFSZ);
-			if(!buff){
-				return S_ENOMEM;
-			}
-
-			if(fread(buff, sizeof(unsigned char), POSLLH_BUFFSZ, fin) != POSLLH_BUFFSZ){
-				free(buff);
-				return S_EREAD;
-			}
-
-			if((cks = ubx_cksum(buff, POSLLH_BUFFSZ, fin)) == S_OK){
-				posllh_s = (struct s_POSLLH *)malloc(sizeof(struct s_POSLLH));
-				if(!posllh_s){
-					free(buff);
-					return S_EPTNULL;
-				}
-				if((cargar_s = cargar_sPOSLLH(posllh_s, fecha, buff)) == S_OK){
-					deb = MSJ_OK;
-					imp_log(flog, NULL, NULL, &deb);
-				}
-
-				else{
-					free(buff);
-					free(posllh_s);
-					return cargar_s;
-				}
-				if((*add_nodo)(posllh_s, lista, NAV_POSLLH) == ST_OK){
-					deb = CARGA_MSJ;
-					imp_log(flog, NULL, NULL, &deb);
-					(*index)++;
-					free(posllh_s);
-					free(buff);
-					break;
-				}
-				else{
-					free(buff);
-					free(posllh_s);
-					return S_EAGR;
-				}
-			}
-
-			else{
-				free(buff);
-				return cks;
-			}
-	}
-
 
 	return S_OK;
-
 }
 
 //procesa los datos de la sentencia y carga la estructura PVT
@@ -419,4 +427,230 @@ ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin){
 	}
 
 	return S_CK_INV;
+}
+
+ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog){
+
+	unsigned char *stdbuff, info_largo[LARGO_CK_SZ];
+	int c;
+	unsigned int id, largo;
+	debug_t deb;
+	ubxst_t cks, cargar_s;
+	struct s_PVT *pvt_s;
+	struct s_POSLLH * posllh_s;
+	struct s_TIM_TOS * tt_s;
+
+	if(!fecha || !lista || !index || !add_nodo){
+
+		return S_EPTNULL;
+	}
+
+
+	stdbuff = (unsigned char *)malloc(sizeof(unsigned char)*4);
+	if(!stdbuff){
+		return S_ENOMEM;
+	}
+
+	if((c = getchar()) == EOF){
+		free(stdbuff);
+		return S_EREAD;
+	}
+
+	stdbuff[CLASS_IND] = c;
+
+	switch(c){
+		case NAV_CL:
+			if((id = getchar()) == EOF){
+				free(stdbuff);
+				return S_EREAD;
+			}
+			
+			if(id != PVT_ID && id != POSLLH_ID){
+				free(stdbuff);
+				return S_ID_INV;
+			}
+
+			stdbuff[ID_IND] = id;
+
+			break;
+		case TIM_CL:
+			if((id = getchar()) == EOF){
+				free(stdbuff);
+				return S_EREAD;
+			}
+			if(id != TIM_TOS_ID){
+				free(stdbuff);
+				return S_ID_INV;
+			}
+			stdbuff[ID_IND] = id;
+
+			break;
+		default:
+			free(stdbuff);
+			return S_CLASS_INV;
+	}
+
+	deb = ID_D;
+	imp_log(flog, NULL, NULL, &deb);
+
+	if(fread(info_largo, sizeof(unsigned char), LARGO_CK_SZ, stdin) != LARGO_CK_SZ){
+		free(stdbuff);
+		return S_EREAD;
+	}
+
+	stdbuff[LARGO_LSB_IND] = info_largo[LSB_IND];
+	stdbuff[LARGO_MSB_IND] = info_largo[MSB_IND];
+	
+	
+	largo = calc_largo(info_largo);
+	
+	if((id == PVT_ID && largo != PVT_L) || (id == TIM_TOS_ID && largo != TIM_TOS_L) || (id == POSLLH_ID && largo != POSLLH_L)){
+		free(stdbuff);
+		return S_LARGO_INV;
+	}
+
+
+	switch(id){
+		case PVT_ID:
+			stdbuff = (unsigned char *)realloc(stdbuff, sizeof(unsigned char)*PVT_BUFFSZ);
+			if(!stdbuff){
+				free(stdbuff);
+				return S_ENOMEM;
+			}
+
+			for(int i = 4; i < 96; i++){
+				if((stdbuff[i] = getchar()) == EOF){
+					free(stdbuff);
+					return S_EREAD;
+				}
+			}
+
+			if((cks = ubx_cksum(stdbuff, PVT_BUFFSZ, stdin)) == S_OK){
+
+				pvt_s = (struct s_PVT *)malloc(sizeof(struct s_PVT));
+				if(!pvt_s){
+					free(stdbuff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sPVT(pvt_s, fecha, stdbuff)) == S_OK){
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
+				}
+
+				else{
+					free(stdbuff);
+					free(pvt_s);
+					return cargar_s;
+				}
+
+				if((*add_nodo)(pvt_s, lista, NAV_PVT) == ST_OK){
+					deb = CARGA_MSJ;
+					imp_log(flog, NULL, NULL, &deb);
+					(*index)++;
+					free(pvt_s);
+					free(stdbuff);
+					break;
+				}
+				else{
+					free(stdbuff);
+					free(pvt_s);
+					return S_EAGR;
+				}
+
+			}
+
+			else{
+				free(stdbuff);
+				return cks;
+			}
+		case TIM_TOS_ID:
+			stdbuff = (unsigned char *)realloc(stdbuff, sizeof(unsigned char)*TIM_TOS_BUFFSZ);
+			if(!stdbuff){
+				return S_ENOMEM;
+			}
+
+
+			for(int i = 4; i < 60; i++){
+				if((stdbuff[i] = getchar()) == EOF){
+					free(stdbuff);
+					return S_EREAD;
+				}
+			}
+
+			if((cks = ubx_cksum(stdbuff, TIM_TOS_BUFFSZ, stdin)) == S_OK){
+				tt_s = (struct s_TIM_TOS *)malloc(sizeof(struct s_TIM_TOS));
+				if(!tt_s){
+					free(stdbuff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sTIMTOS(tt_s, fecha, stdbuff)) == S_OK){
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
+					free(stdbuff);
+					free(tt_s);
+					break;
+				}
+
+				else{
+					free(stdbuff);
+					free(tt_s);
+					return cargar_s;
+				}
+			}
+
+			else{
+				free(stdbuff);
+				return cks;
+			}
+		case POSLLH_ID:
+			stdbuff = (unsigned char *)realloc(stdbuff, sizeof(unsigned char)*POSLLH_BUFFSZ);
+			if(!stdbuff){
+				return S_ENOMEM;
+			}
+
+			for(int i = 4; i < 32; i++){
+				if((stdbuff[i] = getchar()) == EOF){
+					free(stdbuff);
+					return S_EREAD;
+				}
+			}			
+
+			if((cks = ubx_cksum(stdbuff, POSLLH_BUFFSZ, stdin)) == S_OK){
+				posllh_s = (struct s_POSLLH *)malloc(sizeof(struct s_POSLLH));
+				if(!posllh_s){
+					free(stdbuff);
+					return S_EPTNULL;
+				}
+				if((cargar_s = cargar_sPOSLLH(posllh_s, fecha, stdbuff)) == S_OK){
+					deb = MSJ_OK;
+					imp_log(flog, NULL, NULL, &deb);
+				}
+
+				else{
+					free(stdbuff);
+					free(posllh_s);
+					return cargar_s;
+				}
+				if((*add_nodo)(posllh_s, lista, NAV_POSLLH) == ST_OK){
+					deb = CARGA_MSJ;
+					imp_log(flog, NULL, NULL, &deb);
+					(*index)++;
+					free(posllh_s);
+					free(stdbuff);
+					break;
+				}
+				else{
+					free(stdbuff);
+					free(posllh_s);
+					return S_EAGR;
+				}
+			}
+
+			else{
+				free(stdbuff);
+				return cks;
+			}
+	}
+
+	return S_OK;
 }
