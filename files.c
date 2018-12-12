@@ -1,7 +1,7 @@
 #include "files.h"
 
 
-// abre los archivos correspondientes segun los argumentos ingresados
+/* abre los archivos correspondientes segun los argumentos ingresados*/
 status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
     if(!fin || !fout || !flog || !arg){
@@ -52,7 +52,7 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
     return ST_OK;
 }
 
-// cierra los arhivos abiertos
+/* cierra los arhivos abiertos*/
 status_t cerrar_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
 
     if(!fin || !fout || !flog || !arg){

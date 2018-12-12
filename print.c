@@ -75,7 +75,7 @@ void printHelp(void){
 	printf("%s\n", HELP);
 }
 
-//de acuerdo al tipo de pointer ingresado imprime mensajes de error, warning y debug en el archivo log
+/* de acuerdo al tipo de pointer ingresado imprime mensajes de error, warning y debug en el archivo log */
 void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb){
 
     if(!flog){

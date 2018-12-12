@@ -22,17 +22,17 @@
 #define LARGO_MSB_IND 3
 #define LARGO_LSB_IND 2
 
-//defines para calc_largo
+/*defines para calc_largo*/
 #define MSB_IND 1
 #define LSB_IND 0
 #define SHIFT_1B 8
 
-//defines para ubx_cksum
+/*defines para ubx_cksum*/
 #define POS_CK -4
 #define CKA_IND 0
 #define CKB_IND 1
 
-//defines para calc_fecha
+/*defines para calc_fecha*/
 #define P_ANIO_MBIND 9
 #define P_ANIO_LBIND 8
 #define PVT_MOIND 10
@@ -48,7 +48,7 @@
 #define TT_MININD 17
 #define TT_SEGIND 18
 
-//defines para cargar_pvt
+/*defines para cargar_pvt */
 #define VALID_IND 15
 #define FLAG_IND 25
 #define MASK_FIX 0x01
@@ -56,7 +56,7 @@
 #define PDOP_MSB 80
 #define PDOP_LSB 81
 
-//defines cargar_pos
+/*defines cargar_pos*/
 #define SHIFT_2B 16
 #define SHIFT_3B 24
 #define PVTLON_B0 28
@@ -86,7 +86,7 @@
 #define SCALING_POS 0.0000001
 #define SCALING_PDOP 0.01
 
-//defines cargar_precision
+/*defines cargar_precision */
 #define HACC_B0 27
 #define HACC_B1 26
 #define HACC_B2 25
@@ -96,14 +96,12 @@
 #define VACC_B2 29 
 #define VACC_B3 28
 
-//defines cargar timtos
+/*defines cargar timtos */
 #define VERSION_IND 4
 #define GNSS_IND 5
 
 
 
-
-// typedef enum{S_EPTNULL, S_ENOMEM, S_EREAD, S_CLASS_INV, S_ID_INV, S_CK_INV, S_LARGO_INV, S_FIX_INV, S_EAGR, S_OK} ubxst_t;
 unsigned int calc_largo(unsigned char info[]);
 ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, struct args *arg);
 ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog);

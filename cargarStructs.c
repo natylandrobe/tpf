@@ -1,8 +1,7 @@
 #include "cargarStructs.h" 
 
-#define INDEX_FECHA_RMC 9
 
-//procesa la sentencia zda, carga la estructura y asigna su fecha a la estructura de fecha date
+/*procesa la sentencia zda, carga la estructura y asigna su fecha a la estructura de fecha date*/
 status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
@@ -25,25 +24,25 @@ status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         
         
 
-        horario= strtod(tokens[INDEX_HORARIO_ZDA], &check);
+        horario = strtod(tokens[INDEX_HORARIO_ZDA], &check);
 
         if(*check != END_STR){
                return ST_SENTINV;
         }
 
-        dia= strtod(tokens[INDEX_DIA_ZDA], &check);
+        dia = strtod(tokens[INDEX_DIA_ZDA], &check);
 
         if(*check != END_STR){
                 return ST_SENTINV;
         }
 
-        mes= strtod(tokens[INDEX_MES_ZDA], &check);
+        mes = strtod(tokens[INDEX_MES_ZDA], &check);
 
         if(*check != END_STR){
                 return ST_SENTINV;
         }
 
-        anio= strtod(tokens[INDEX_ANIO_ZDA], &check);
+        anio = strtod(tokens[INDEX_ANIO_ZDA], &check);
 
         if(*check != END_STR){
                 return ST_SENTINV;
@@ -54,7 +53,7 @@ status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
         if(*check != END_STR){
                 return ST_SENTINV;
         }
-        str= strtok(tokens[INDEX_DIF_TIME_ZONE_AUX_ZDA],ASTERISCO);
+        str = strtok(tokens[INDEX_DIF_TIME_ZONE_AUX_ZDA],ASTERISCO);
                 i = 0;
         while(str != NULL){
                 token[i] = str;
@@ -86,7 +85,7 @@ status_t cargar_struct_zda( char *s, struct s_ZDA *Zda, struct fecha *date){
 
 
 
-//procesa la sentencia rmc, carga la estructura y actualiza la fecha date
+/*procesa la sentencia rmc, carga la estructura y actualiza la fecha date */
 status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 
         char *str, *check;
@@ -149,7 +148,7 @@ status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         Rmc->f.segundos = horario-Rmc->f.hora*AUX_PARA_HOR_MIN_SEG-Rmc->f.minutos*AUX_PARA_MIN_SEG;
         Rmc->f.dia = dia;
         Rmc->f.mes = mes;
-        Rmc->f.anio= anio;
+        Rmc->f.anio = anio;
         *date= Rmc->f;  
         Rmc->lat = lat;
         Rmc->lon = lon;
@@ -158,7 +157,7 @@ status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
         return ST_OK;
 }
 
-//procesa la sentencia gga y carga la estructura
+/* procesa la sentencia gga y carga la estructura*/
 status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
 
 
@@ -245,7 +244,7 @@ status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
 
 
 
-//carga la estructura fecha con la del sistema
+/*carga la estructura fecha con la del sistema*/
 status_t defaultFecha(struct fecha *def){
 
 	time_t rawtime;
@@ -272,7 +271,7 @@ status_t defaultFecha(struct fecha *def){
 
 }
 
-//carga la estructura args con los argumentos default
+/*carga la estructura args con los argumentos default*/
 status_t defaultArgs(struct args *arg){
 
 	if(!arg){

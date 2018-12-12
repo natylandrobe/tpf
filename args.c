@@ -124,7 +124,7 @@ status_t takeArgs(int argc, char *argv[], struct args *arg){
 }
 
 
-//toma el argumento y por interfaz devuelve el tipo de argumento correspondiente
+/*toma el argumento y por interfaz devuelve el tipo de argumento correspondiente */
 status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 
 	const char dic_args[][MAX_STR] = {"--help", "--name", "--protocol", "--infile", "--outfile", "--logfile", "--maxlen"};
