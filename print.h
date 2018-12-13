@@ -55,10 +55,10 @@
 #define MSJ_IMP "[DEBUG] Mensaje impreso"
 #define MSJ_FULLLIST "[WARNING] Se descartan mensajes por lista llena"
 
-status_t printMetadata(char *name, struct fecha *fecha, FILE *fout);
+status_t printMetadata(const char *name, const struct fecha *fecha, FILE *fout);
 status_t printTrkC(FILE *fout);
-status_t printStruct(struct trkpt *track, FILE *fout);
+status_t printStruct(const struct trkpt *track, FILE *fout);
 void printHelp(void);
-void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb);
+void imp_log(FILE *flog, const status_t * status, const ubxst_t *ubx_st, const debug_t *deb);
 
 #endif

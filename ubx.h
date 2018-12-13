@@ -103,16 +103,16 @@
 
 
 unsigned int calc_largo(unsigned char info[]);
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, struct args *arg);
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, const struct args *arg);
 ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog);
-ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin);
-ubxst_t calc_fecha(unsigned char *buff, struct fecha *fecha, unsigned char id);
-ubxst_t cargar_fecha(void *dato, struct fecha *funi, unsigned char id, unsigned char *buff, ubxst_t (*proc_fecha)(unsigned char *, struct fecha *, unsigned char));
-ubxst_t cargar_precision(struct s_POSLLH *dato, unsigned char *buff);
-ubxst_t cargar_pos(void *dato, unsigned char id, unsigned char *buff);
-ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff);
-ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, unsigned char *buff);
-ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, unsigned char *buff);
+ubxst_t ubx_cksum(const unsigned char *ckBuff, int n, FILE *fin);
+ubxst_t calc_fecha(const unsigned char *buff, struct fecha *fecha, unsigned char id);
+ubxst_t cargar_fecha(const void *dato, struct fecha *funi, unsigned char id, const unsigned char *buff, ubxst_t (*proc_fecha)(const unsigned char *, struct fecha *, unsigned char));
+ubxst_t cargar_precision(struct s_POSLLH *dato, const unsigned char *buff);
+ubxst_t cargar_pos(const void *dato, unsigned char id, const unsigned char *buff);
+ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, const unsigned char *buff);
+ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, const unsigned char *buff);
+ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, const unsigned char *buff);
 
 
 #endif

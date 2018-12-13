@@ -27,11 +27,11 @@
 #define CANT_CSUM 2
 
 unsigned char nmea_checksum(const char * s);
-sent_t checkLine(char *s, FILE *flog);
+sent_t checkLine(const char *s, FILE *flog);
 bool checkDia(int dia); 
 bool checkMes(int mes);
 bool checkAnio(int anio);
-bool checkNum(char *s);
+bool checkNum(const char *s);
 bool checkMembers(double lat, double lon, cal_t cal, long int cant);
 bool checkMembersrmc(double lat, double lon);
 

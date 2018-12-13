@@ -158,7 +158,7 @@ status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date){
 }
 
 /* procesa la sentencia gga y carga la estructura*/
-status_t cargar_struct_gga(char *s,struct s_GGA *Gga, struct fecha *date){
+status_t cargar_struct_gga(char *s, struct s_GGA *Gga, struct fecha *date){
 
 
         char *str, *check;
@@ -275,7 +275,7 @@ status_t defaultFecha(struct fecha *def){
 status_t defaultArgs(struct args *arg){
 
 	if(!arg){
-		return ST_EPTNULL;
+	        return ST_EPTNULL;
 	}
 
 	arg->name = (char *)malloc(sizeof(char)*(strlen(DEFAULT_NAME)+1));
@@ -291,7 +291,7 @@ status_t defaultArgs(struct args *arg){
 	if(arg->infile_n == NULL){
 		free(arg->name);
 		arg->name = NULL;
-		return ST_ENOMEM;
+	        return ST_ENOMEM;
 	}
 
 	strcpy(arg->infile_n, DEFAULT_INFILE);

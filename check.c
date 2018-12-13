@@ -2,7 +2,7 @@
 
 /*toma una sentencia y devuelve que tipo de nma es*/
 
-sent_t checkLine(char *s, FILE *flog){
+sent_t checkLine(const char *s, FILE *flog){
 
 	debug_t deb;
 	ubxst_t debug;
@@ -114,7 +114,7 @@ bool checkAnio(int anio){
 }
 
 /* Verifica que la cadena recibida representa un numero decimal */
-bool checkNum(char *s){
+bool checkNum(const char *s){
 
 	int i;
 
