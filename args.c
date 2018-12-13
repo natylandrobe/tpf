@@ -134,7 +134,7 @@ status_t procesar_arg(int argum, char *argv[], args_t *argp, size_t index){
 		return ST_EPTNULL;
 	}
 
-	if(strlen(argv[index]) == 2){
+	if(strlen(argv[index]) == ARGC_IND){
 		argum = tolower(argum);
 		for(i = 0; i < CANT_ARGS; i++){
 
