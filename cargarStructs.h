@@ -62,8 +62,8 @@
 
 #define RAND_DELIM 50
 
-double convertirLon(const char lon[], char * cardinal);
-double convertirLat(const char lat[], char * cardinal);
+double convertirLon(const char lon[], const char * cardinal);
+double convertirLat(const char lat[], const char * cardinal);
 cal_t convertirCal(long int cal);
 status_t cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
 status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);
