@@ -100,6 +100,10 @@
 #define VERSION_IND 4
 #define GNSS_IND 5
 
+/*defines procesar_santdard */
+#define PAYL_IND 4
+
+
 
 
 unsigned int calc_largo(unsigned char info[]);

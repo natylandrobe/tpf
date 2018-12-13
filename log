@@ -17,7 +17,7 @@
 [DEBUG] ID detectado
 [DEBUG] Mensaje recolectado
 [DEBUG] Mensaje cargado a la lista
-[DEBUG] Buscando bytes de sincronismo
+[WARNING] Se descartan mensajes por lista llena
 [DEBUG] Mensaje impreso
 [DEBUG] Mensaje impreso
 [DEBUG] Mensaje impreso
