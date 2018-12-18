@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <string.h>
 #include "main.h"
-
 
 int main (int argc, char *argv[]){
 	FILE *fin = NULL, *fout = NULL, *flog = NULL;
@@ -18,6 +15,7 @@ int main (int argc, char *argv[]){
 	ubxst_t proc_ubx;
 	debug_t deb;
 
+	/* Se carga la fecha del sistema y los argumentos Default*/
 	if((st = defaultFecha(&fecha)) != ST_OK){
 		imp_log(stderr, &st, NULL, NULL);
 		return EXIT_SUCCESS;
@@ -28,6 +26,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/* Se procesan los argumentos recibidos*/
 	if((st = takeArgs(argc, argv, &arg)) == ST_HELP){
 
 		if((st = liberar_args(&arg)) != ST_OK){
@@ -63,6 +62,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/*Se abren los archivos correspondientes*/
 	if((st = abrir_archivos(&fin, &fout, &flog, &arg)) != ST_OK){
 
 		imp_log(stderr, &st, NULL, NULL);
@@ -75,6 +75,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/*Se imprime la metadata*/
 	if((st = printMetadata(arg.name, &fecha, fout)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 
@@ -92,7 +93,7 @@ int main (int argc, char *argv[]){
 	}
 
 
-
+	/*Se crea la lista*/
 	if((st = crear_lista(&lista)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 
@@ -109,6 +110,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/*Se procesa el protocolo NMEA*/
 	if(arg.protocol == NMEA){
 
 		while(i < arg.maxlen && fgets(linea, MAX_LINE, fin)){
@@ -184,6 +186,7 @@ int main (int argc, char *argv[]){
 		}
 	}
 
+	/*Se procesa el protocolo UBX*/
 	else if(arg.protocol == UBX){
 		while((proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog, &arg)) != S_EREAD && i < arg.maxlen){
 			if(proc_ubx != S_OK){
@@ -212,7 +215,7 @@ int main (int argc, char *argv[]){
 	}
 
 
-
+	/*Se imprime la lista*/
 	if((st = imprimir_lista(lista, fout, flog)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 
@@ -229,6 +232,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/*Se imprimen los cierres de tags*/
 	if((st = printTrkC(fout)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 
@@ -245,6 +249,7 @@ int main (int argc, char *argv[]){
 		return EXIT_SUCCESS;
 	}
 
+	/*Se libera la memoria pedida durante el programa y se cierran los archivos*/
 	if((st = destruir_lista(&lista)) != ST_OK){
 		imp_log(flog, &st, NULL, NULL);
 

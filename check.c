@@ -7,15 +7,22 @@ sent_t checkLine(const char *s, FILE *flog){
 	debug_t deb;
 	ubxst_t debug;
 	char checkSum[CANT_CSUM];
+	char *asterisco_p;
 
 	if(!s || !flog){
 		
 		return NING;
 	}
 
+	if(!(asterisco_p = strrchr(s, ASTERISCO_C))){
+		debug = S_CK_INV;
+		imp_log(flog, NULL, &debug, NULL);
+		return NING;
+	}
+
 	/* Asumimos que todas las lineas traen '*' */
-	checkSum[0] = *(strrchr(s, ASTERISCO_C) + 1);
-	checkSum[1] = *(strrchr(s, ASTERISCO_C) + 2);
+	checkSum[0] = *(asterisco_p + 1);
+	checkSum[1] = *(asterisco_p + 2);
 
 	deb = SYNC;
 	imp_log(flog, NULL, NULL, &deb);

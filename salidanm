@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gpx version="1.1" creator="ubxnmea-gpx" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>Default Name</name>
+    <time>2018-12-18T18:42:58Z</time>
+  </metadata>
+  <trk>
+    <trkseg>
+      <trkpt lat="19.918633" lon="-77.709017">
+        <ele>0.000000</ele>
+        <time>2018-9-30T11:28:36.854Z</time>
+      </trkpt>
+      <trkpt lat="20.115100" lon="-76.756150">
+        <ele>0.000000</ele>
+        <time>2018-9-30T11:28:37.854Z</time>
+      </trkpt>
+      <trkpt lat="22.408317" lon="-79.949267">
+        <ele>0.000000</ele>
+        <time>2018-11-13T11:28:38.854Z</time>
+      </trkpt>
+      <trkpt lat="20.115100" lon="-76.756150">
+        <ele>0.000000</ele>
+        <time>2018-9-30T11:28:37.854Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
