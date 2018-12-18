@@ -518,7 +518,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 				return S_ENOMEM;
 			}
 
-			for(int i = 4; i < 96; i++){
+			for(int i = (-POS_CK); i < PVT_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;
@@ -570,7 +570,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 			}
 
 
-			for(int i = 4; i < 60; i++){
+			for(int i = (-POS_CK); i < TIM_TOS_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;
@@ -608,7 +608,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 				return S_ENOMEM;
 			}
 
-			for(int i = 4; i < 32; i++){
+			for(int i = (-POS_CK); i < POSLLH_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;

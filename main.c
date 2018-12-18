@@ -112,9 +112,9 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	if(arg.protocol == NMEA){
 
 		while(i < arg.maxlen && fgets(linea, MAX_LINE, fin)){
-
+			
 			t = checkLine(linea, flog);
-
+			
 			switch (t){
 				case GGA: 
 					if((st = cargar_struct_gga(linea,&Gga,&fecha)) == ST_OK){
