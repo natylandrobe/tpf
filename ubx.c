@@ -1,7 +1,7 @@
 #include "ubx.h"
 
-//lee la sentencia ubx, procesa los datos y de ser correctos, carga las estructuras y las agrega a la lista si corresponde
-ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, struct args *arg){
+/*lee la sentencia ubx, procesa los datos y de ser correctos, carga las estructuras y las agrega a la lista si corresponde*/
+ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog, const struct args *arg){
 	unsigned char info_largo[LARGO_CK_SZ], *buff;
 	unsigned int id, largo;
 	int c;
@@ -11,7 +11,7 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	struct s_TIM_TOS * tt_s;
 	debug_t deb;
 
-	if(!fin || !flog || !fecha || !lista || !index || !add_nodo){
+	if(!fin || !flog || !fecha || !lista || !index || !add_nodo || !arg){
 		return S_EPTNULL;
 	}
 	
@@ -219,8 +219,8 @@ ubxst_t procesar_ubx(FILE *fin, struct fecha *fecha, lista_t *lista, size_t *ind
 	return S_OK;
 }
 
-//procesa los datos de la sentencia y carga la estructura PVT
-ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff){
+/*procesa los datos de la sentencia y carga la estructura PVT*/
+ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, const unsigned char *buff){
 
 	if(!dato || !funi || !buff){
 		return S_EPTNULL;
@@ -246,8 +246,8 @@ ubxst_t cargar_sPVT(struct s_PVT * dato, struct fecha *funi, unsigned char *buff
 	return S_OK;
 }
 
-//procesa los datos de la sentencia y carga la estructura POSLLH
-ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, unsigned char *buff){
+/*procesa los datos de la sentencia y carga la estructura POSLLH*/
+ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, const unsigned char *buff){
 
 	if(!dato || !funi || !buff){
 		return S_EPTNULL;
@@ -268,8 +268,8 @@ ubxst_t cargar_sPOSLLH(struct s_POSLLH *dato, struct fecha *funi, unsigned char 
 	return S_OK;
 }
 
-//procesa los datos de la sentencia y carga la estructura TIM TOS
-ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, unsigned char *buff){
+/*procesa los datos de la sentencia y carga la estructura TIM TOS*/
+ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, const unsigned char *buff){
 
 	if(!dato || !funi || !buff){
 		return S_EPTNULL;
@@ -285,8 +285,8 @@ ubxst_t cargar_sTIMTOS(struct s_TIM_TOS *dato, struct fecha *funi, unsigned char
 	return S_OK;
 }
 
-//procesa y carga la precision a la estructura POSLLH
-ubxst_t cargar_precision(struct s_POSLLH *dato, unsigned char *buff){
+/*procesa y carga la precision a la estructura POSLLH*/
+ubxst_t cargar_precision(struct s_POSLLH *dato, const unsigned char *buff){
 
 	if(!dato || !buff){
 		return S_EPTNULL;
@@ -298,8 +298,8 @@ ubxst_t cargar_precision(struct s_POSLLH *dato, unsigned char *buff){
 	return S_OK;
 }
 
-//de acuerdo con la sentencia recibida, procesa y carga los datos de posicion en la estructura
-ubxst_t cargar_pos(void *dato, unsigned char id, unsigned char *buff){
+/*de acuerdo con la sentencia recibida, procesa y carga los datos de posicion en la estructura*/
+ubxst_t cargar_pos(const void *dato, unsigned char id, const unsigned char *buff){
 	struct s_PVT * pvt_s;
 	struct s_POSLLH * posllh_s;
 
@@ -329,8 +329,8 @@ ubxst_t cargar_pos(void *dato, unsigned char id, unsigned char *buff){
 	return S_OK;
 }
 
-//de acuerdo al tipo de sentencia carga la estructura fecha de la misma, y si corresponde, actualiza la fecha universal
-ubxst_t cargar_fecha(void *dato, struct fecha *funi, unsigned char id, unsigned char *buff, ubxst_t (*proc_fecha)(unsigned char *, struct fecha *, unsigned char)){
+/*de acuerdo al tipo de sentencia carga la estructura fecha de la misma, y si corresponde, actualiza la fecha universal */
+ubxst_t cargar_fecha(const void *dato, struct fecha *funi, unsigned char id, const unsigned char *buff, ubxst_t (*proc_fecha)(const unsigned char *, struct fecha *, unsigned char)){
 	struct s_PVT * pvt_s;
 	struct s_TIM_TOS * tt_s;
 	struct s_POSLLH * posllh_s;
@@ -367,8 +367,8 @@ ubxst_t cargar_fecha(void *dato, struct fecha *funi, unsigned char id, unsigned 
 	return S_OK;
 }
 
-//procesa la fecha de la sentencia y la carga por interfaz en la estructura
-ubxst_t calc_fecha(unsigned char *buff, struct fecha *fecha, unsigned char id){
+/*procesa la fecha de la sentencia y la carga por interfaz en la estructura*/
+ubxst_t calc_fecha(const unsigned char *buff, struct fecha *fecha, unsigned char id){
 
 	if(!buff || !fecha){
 		return S_EPTNULL;
@@ -396,13 +396,13 @@ ubxst_t calc_fecha(unsigned char *buff, struct fecha *fecha, unsigned char id){
 	return S_OK;
 }
 
-//calcula el largo de la sentencia
+/*calcula el largo de la sentencia*/
 unsigned int calc_largo(unsigned char info[]){
 	return (info[MSB_IND] << SHIFT_1B)|info[LSB_IND];
 }
 
-//verifica que el checksum sea correcto
-ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin){
+/*verifica que el checksum sea correcto*/
+ubxst_t ubx_cksum(const unsigned char *ckBuff, int n, FILE *fin){
 
 	unsigned char ck_a = 0;
 	unsigned char ck_b = 0;
@@ -432,7 +432,7 @@ ubxst_t ubx_cksum(unsigned char *ckBuff, int n, FILE *fin){
 ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, status_t (*add_nodo)(void *, lista_t *, sent_t), FILE *flog){
 
 	unsigned char *stdbuff, info_largo[LARGO_CK_SZ];
-	int c;
+	int c, i;
 	unsigned int id, largo;
 	debug_t deb;
 	ubxst_t cks, cargar_s;
@@ -518,7 +518,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 				return S_ENOMEM;
 			}
 
-			for(int i = (-POS_CK); i < PVT_BUFFSZ; i++){
+			for(i = PAYL_IND; i < PVT_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;
@@ -570,7 +570,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 			}
 
 
-			for(int i = (-POS_CK); i < TIM_TOS_BUFFSZ; i++){
+			for(i = PAYL_IND; i < TIM_TOS_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;
@@ -608,7 +608,7 @@ ubxst_t procesar_standard(struct fecha *fecha, lista_t *lista, size_t *index, st
 				return S_ENOMEM;
 			}
 
-			for(int i = (-POS_CK); i < POSLLH_BUFFSZ; i++){
+			for(i = PAYL_IND; i < POSLLH_BUFFSZ; i++){
 				if((stdbuff[i] = getchar()) == EOF){
 					free(stdbuff);
 					return S_EREAD;

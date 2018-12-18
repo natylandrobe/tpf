@@ -1,8 +1,8 @@
 #include "files.h"
 
 
-// abre los archivos correspondientes segun los argumentos ingresados
-status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
+/* abre los archivos correspondientes segun los argumentos ingresados*/
+status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, const struct args *arg){
 
     if(!fin || !fout || !flog || !arg){
         return ST_EPTNULL;
@@ -52,8 +52,8 @@ status_t abrir_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
     return ST_OK;
 }
 
-// cierra los arhivos abiertos
-status_t cerrar_archivos(FILE **fin, FILE **fout, FILE **flog, struct args *arg){
+/* cierra los arhivos abiertos*/
+status_t cerrar_archivos(FILE **fin, FILE **fout, FILE **flog, const struct args *arg){
 
     if(!fin || !fout || !flog || !arg){
         return ST_EPTNULL;

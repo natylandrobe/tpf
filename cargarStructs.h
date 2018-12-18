@@ -10,7 +10,7 @@
 #define ASTERISCO "*"
 
 
-//para el GGA
+/*para el GGA*/
 #define DELIM ","
 #define CANT_TOKEN_GGA 15
 #define INDEX_HORARIO_GGA 1
@@ -24,7 +24,7 @@
 #define INDEX_ELE 9
 #define INDEX_SEP 11
 
-//para el RMC
+/*para el RMC*/
 #define STATUS_RMC_ACT 'A'
 #define STATUS_RMC_VOID 'V'
 #define COMPARE_STATUS_RMC_ACT "A"
@@ -41,7 +41,7 @@
 #define AUX_2_PARA_FECHA 100
 #define AUX_3_PARA_FECHA 2000
 
-//Para el ZDA
+/*Para el ZDA*/
 #define CANT_TOKEN_ZDA 6
 #define CANT_TOKEN_AUX_ZDA 2
 #define INDEX_HORARIO_ZDA 1 
@@ -62,8 +62,8 @@
 
 #define RAND_DELIM 50
 
-double convertirLon(const char lon[], char * cardinal);
-double convertirLat(const char lat[], char * cardinal);
+double convertirLon(const char lon[], const char * cardinal);
+double convertirLat(const char lat[], const char * cardinal);
 cal_t convertirCal(long int cal);
 status_t cargar_struct_zda(char *s, struct s_ZDA *Zda, struct fecha *date);
 status_t cargar_struct_rmc(char *s, struct s_RMC *Rmc, struct fecha *date);

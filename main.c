@@ -4,7 +4,7 @@
 
 
 int main (int argc, char *argv[]){
-FILE *fin = NULL, *fout = NULL, *flog = NULL;
+	FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	struct s_RMC Rmc;
 	struct s_GGA Gga;
 	struct s_ZDA Zda;
@@ -185,7 +185,7 @@ FILE *fin = NULL, *fout = NULL, *flog = NULL;
 	}
 
 	else if(arg.protocol == UBX){
-		while(i < arg.maxlen && (proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog, &arg)) != S_EREAD){
+		while((proc_ubx = procesar_ubx(fin, &fecha, &lista, &i, &agregar_nodo, flog, &arg)) != S_EREAD && i < arg.maxlen){
 			if(proc_ubx != S_OK){
 				imp_log(flog, NULL, &proc_ubx, NULL);
 				if(proc_ubx == S_EPTNULL || proc_ubx == S_ENOMEM){

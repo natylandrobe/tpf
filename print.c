@@ -1,7 +1,7 @@
 #include "print.h"
 
 /* Imprime la metadata en XML en el archivo de salida*/
-status_t printMetadata(char *name, struct fecha *fecha, FILE *fout){
+status_t printMetadata(const char *name, const struct fecha *fecha, FILE *fout){
 
    	if(!name || !fecha || !fout){
 
@@ -46,7 +46,7 @@ status_t printTrkC(FILE *fout){
 }
 
 /* Imprime la estructura en formato XML en el archivo de salida*/
-status_t printStruct(struct trkpt *track, FILE *fout){
+status_t printStruct(const struct trkpt *track, FILE *fout){
 
 	if(!track || !fout){
 		return ST_EPTNULL;
@@ -75,8 +75,8 @@ void printHelp(void){
 	printf("%s\n", HELP);
 }
 
-//de acuerdo al tipo de pointer ingresado imprime mensajes de error, warning y debug en el archivo log
-void imp_log(FILE *flog, status_t * status, ubxst_t *ubx_st, debug_t *deb){
+/* de acuerdo al tipo de pointer ingresado imprime mensajes de error, warning y debug en el archivo log */
+void imp_log(FILE *flog, const status_t * status, const ubxst_t *ubx_st, const debug_t *deb){
 
     if(!flog){
         return ;
